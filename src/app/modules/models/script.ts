@@ -1,20 +1,20 @@
 export class Script {
   root: string = "";
-  children: Child[] = [];
+  children: Step[] = [];
 }
 
-export class Child {
+export class Step {
   id: string = "";
   text: string = "";
-  answer: Answer[] = [];
+  answerType: AnswerType = AnswerType.BUTTON;
+  answers: Answer[] = [];
 }
 
 export class Answer {
-  type: AnswerType = AnswerType.BUTTON;
   text: string = "";
-
+  action: string = "";
 }
 
 export enum AnswerType {
-  BUTTON, INPUT, SELECT, COMPONENT
+  BUTTON="BUTTON", INPUT="INPUT", SELECT="SELECT", COMPONENT="COMPONENT"
 }

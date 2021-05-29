@@ -4,10 +4,33 @@
     {
       "id": "root",
       "text": "Hello !",
-      "answer":[{
-        "type": "button",
-        "text": "ok"
-      }]
+      "answerType": "BUTTON",
+      "answers": [
+        {
+          "text": "ok",
+          "action": "action1"
+        }
+      ]
+    },
+    {
+      "id": "action1",
+      "text": "Bien joué !",
+      "answerType": "BUTTON",
+      "answers": [
+        {
+          "text": "Au revoir",
+          "action": "bye"
+        },
+        {
+          "text": "Continuer",
+          "action": "playagain"
+        }
+      ]
+    },
+    {
+      "id": "bye",
+      "text": "Au revoir !",
+      "answerType": "close"
     }
   ]
 }

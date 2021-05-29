@@ -1,0 +1,20 @@
+<ion-content [color]="colorCode" force-overscroll="true">
+  <ion-list no-lines>
+    <app-chat-bubble [chatMessage]="msg" *ngFor="let msg of messages"></app-chat-bubble>
+  </ion-list>
+</ion-content>
+
+<ion-footer no-border class="footer ion-padding" >
+  <!--    [keyboardAttach]="content" [btnClicked]="btnEmitter">-->
+<!--  <ion-toolbar>-->
+    <ion-item class="ion-no-margin ion-no-padding" *ngIf="answerInput">
+      <ion-label class="ion-no-margin"></ion-label>
+      <div item-content style="width:100%;">
+        <ion-input #txtInput [name]="content"></ion-input>
+      </div>
+    </ion-item>
+    <ion-buttons class="ion-margin" *ngIf="answerButton">
+      <button ion-button icon-only (click)="sendMessage(button)" *ngFor="let button of currentAnswers">{{button.text}}</button>
+    </ion-buttons>
+<!--  </ion-toolbar>-->
+</ion-footer>

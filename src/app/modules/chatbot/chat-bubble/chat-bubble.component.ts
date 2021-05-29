@@ -20,8 +20,6 @@ export class ChatBubbleComponent implements OnInit {
     return UtilsService.getCalendarDay(epoch);
   }
 
-
-
   getPosition() {
     return this.chatMessage?.type === MessageType.MSG_REQ ? 'right' : 'left'
   }

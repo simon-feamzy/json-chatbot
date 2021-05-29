@@ -10,7 +10,7 @@ import {ChatbotModule} from "./modules/chatbot/chatbot.module";
   ],
   imports: [
     BrowserModule,
-    ChatbotModule
+    ChatbotModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

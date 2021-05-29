@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ChatbotComponent } from './chatbot.component';
+import { IonicChatbotComponent } from './ionic-chatbot.component';
 
-describe('ChatbotComponent', () => {
-  let component: ChatbotComponent;
-  let fixture: ComponentFixture<ChatbotComponent>;
+describe('IonicChatbotComponent', () => {
+  let component: IonicChatbotComponent;
+  let fixture: ComponentFixture<IonicChatbotComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ChatbotComponent ]
+      declarations: [ IonicChatbotComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ChatbotComponent);
+    fixture = TestBed.createComponent(IonicChatbotComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

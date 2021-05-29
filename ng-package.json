@@ -11,9 +11,11 @@
     "@angular/forms",
     "@angular/platform-browser",
     "@angular/platform-browser-dynamic",
+    "@ionic/angular",
     "@angular/router",
     "rxjs",
     "tslib",
-    "zone.js"
+    "zone.js",
+    "moment"
     ]
 }
