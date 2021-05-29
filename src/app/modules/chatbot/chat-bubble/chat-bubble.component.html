@@ -1,0 +1,9 @@
+<div>
+  <div class="chat-bubble {{getPosition()}}">
+    <div class="message-author">{{chatMessage?.author}}</div>
+    <div class="message">{{chatMessage?.message}}</div>
+    <div class="message-detail">
+      <span>{{formatEpoch(chatMessage?.epoch)}}</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+{
+  "root": "root",
+  "children": [
+    {
+      "id": "root",
+      "text": "Hello !",
+      "answer":[{
+        "type": "button",
+        "text": "ok"
+      }]
+    }
+  ]
+}
