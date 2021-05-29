@@ -1,6 +1,7 @@
 {
   "name": "json-chatbot",
   "version": "0.0.1",
+  "author": "Simon Guerard <simon.guerard@feamzy.com>",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
