@@ -1,6 +1,6 @@
 import {Component, OnInit, Input} from '@angular/core';
-import {ChatMessage, MessageType} from "../../models/message";
-import {UtilsService} from "../../services/utils.service";
+import {ChatMessage, MessageType} from "../models/message";
+import {UtilsService} from "../services/utils.service";
 
 @Component({
   selector: 'app-chat-bubble',

@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {ChatMessage, MessageType} from "../../models/message";
-import {Answer, AnswerType, Step} from "../../models/script";
-import {UtilsService} from "../../services/utils.service";
+import {ChatMessage, MessageType} from "../models/message";
+import {Answer, AnswerType, Step} from "../models/script";
+import {UtilsService} from "../services/utils.service";
 
 @Component({
   selector: 'app-ionic-chatbot',
@@ -26,7 +26,9 @@ export class IonicChatbotComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    debugger
     this.utilsService.parseJson(this.jsonFile).subscribe((rootElt: Step) => {
+      debugger
       this.currentMsg = rootElt;
       this.displayStep();
     });
