@@ -17,3 +17,7 @@ export class MessageType {
   public static readonly MSG_RES: string = "message_response"
 }
 
+export class ChatResponse{
+  key:string="";
+  value:string="";
+}

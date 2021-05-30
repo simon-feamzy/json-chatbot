@@ -1,5 +1,5 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {ChatMessage, MessageType} from "../models/message";
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChatMessage, ChatResponse, MessageType} from "../models/message";
 import {Answer, AnswerType, Step} from "../models/script";
 import {UtilsService} from "../services/utils.service";
 
@@ -12,7 +12,7 @@ export class IonicChatbotComponent implements OnInit {
   @Input() botName: string = "bot";
   @Input() userName: string = "you";
   @Input() jsonFile: string = "";
-  @Input() mapResult: {} = {};
+  @Output() mapResult = new EventEmitter<ChatResponse>();
 
   messages: ChatMessage[] = [];
   colorCode?: string
@@ -55,8 +55,10 @@ export class IonicChatbotComponent implements OnInit {
     }
     setTimeout(function () {
     }, 1000);
-    // @ts-ignore
-    this.mapResult[answer.action] = this.content;
+    let resp = new ChatResponse();
+    resp.key = answer.action;
+    resp.value = this.content;
+    this.mapResult.emit(resp);
     this.messages.push(msg);
     this.currentMsg = this.utilsService.getNextStep(answer.action);
     this.answerButton = false;

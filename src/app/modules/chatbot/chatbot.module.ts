@@ -13,7 +13,7 @@ import {IonicModule} from "@ionic/angular";
   ],
   exports: [
     ChatBubbleComponent,
-    IonicChatbotComponent
+    IonicChatbotComponent,
   ],
   imports: [
     CommonModule,

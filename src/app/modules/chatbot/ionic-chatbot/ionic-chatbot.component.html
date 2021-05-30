@@ -11,7 +11,7 @@
       <ion-label class="ion-no-margin"></ion-label>
       <div item-content style="width:100%;">
         <ion-input #txtInput [name]="content"></ion-input>
-        <ion-button icon-only (click)="sendMessage(currentMsg?.answerType, currentAnswers[0])">Envoyer</ion-button>
+        <ion-button icon-only (click)="sendMessage(currentMsg?.answerType, currentAnswers?[0])">Envoyer</ion-button>
       </div>
     </ion-item>
     <ion-buttons class="ion-margin" *ngIf="answerButton">
