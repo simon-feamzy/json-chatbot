@@ -28,11 +28,9 @@ jobs:
           node-version: 12
           registry-url: https://registry.npmjs.org/
       - uses: actions/upload-artifact@v2.2.3
-       with:
-         # Artifact name
-         name: # optional, default is artifact
-         # A file, directory or wildcard pattern that describes what to upload
-         path: json-chatbot-*.tgz
+        with:
+          name: json-chatbot
+          path: json-chatbot-*.tgz
       - run: npm ci
       - run: npm run packagr
       - run: cd dist
