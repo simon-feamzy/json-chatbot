@@ -1,6 +1,6 @@
 {
   "name": "json-chatbot",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Simon Guerard <simon.guerard@feamzy.com>",
   "license": "MIT",
   "scripts": {
