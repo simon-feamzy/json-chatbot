@@ -5,6 +5,7 @@ import {HttpClientModule} from '@angular/common/http';
 import {ChatbotComponent} from './chatbot/chatbot.component';
 import {AngularSvgIconModule} from 'angular-svg-icon';
 import {AutocompleteLibModule} from 'angular-ng-autocomplete';
+import {FormsModule} from "@angular/forms";
 
 
 @NgModule({
@@ -20,6 +21,7 @@ import {AutocompleteLibModule} from 'angular-ng-autocomplete';
     CommonModule,
     HttpClientModule,
     CommonModule,
+    FormsModule,
     AngularSvgIconModule.forRoot(),
     AutocompleteLibModule
   ]

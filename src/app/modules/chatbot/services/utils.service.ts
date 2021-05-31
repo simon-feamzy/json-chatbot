@@ -41,7 +41,6 @@ export class UtilsService {
     return this.httpClient.get(url + searchTerm, httpOptionsGet)
       .pipe(
         map((data: any) => {
-          debugger
           if (data) {
             return data?._embedded?.stringList.sort();
           }

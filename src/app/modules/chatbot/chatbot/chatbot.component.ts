@@ -76,6 +76,8 @@ export class ChatbotComponent implements OnInit {
     let msg: ChatMessage;
     if (type == AnswerType.INPUT) {
       msg = new ChatMessage(MessageType.MSG_REQ, this.userName, this.content, UtilsService.getEpoch(), 0);
+    } else if (type == AnswerType.SELECT) {
+      msg = new ChatMessage(MessageType.MSG_REQ, this.userName, this.content, UtilsService.getEpoch(), 0);
     } else {//    if (type == AnswerType.BUTTON) {
       msg = new ChatMessage(MessageType.MSG_REQ, this.userName, answer.text, UtilsService.getEpoch(), 0);
     }
@@ -90,7 +92,6 @@ export class ChatbotComponent implements OnInit {
   }
 
   onKey(value: string) {
-    debugger
     this.content = value;
   }
 
