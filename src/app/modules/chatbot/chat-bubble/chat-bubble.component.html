@@ -1,7 +1,10 @@
 <div>
   <div class="chat-bubble {{getPosition()}}">
     <div class="message-author">{{chatMessage?.author}}</div>
-    <div class="message">{{chatMessage?.message}}</div>
+    <div class="message">
+      <svg-icon src="../assets/icons/ellipsis.svg" [svgStyle]="{ 'width.px':40,'height.px':40 }" *ngIf="loading"></svg-icon>
+      <span *ngIf="!loading">{{chatMessage?.message}}</span>
+    </div>
     <div class="message-detail">
       <span>{{formatEpoch(chatMessage?.epoch)}}</span>
     </div>

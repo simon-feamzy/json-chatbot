@@ -16,6 +16,8 @@
     "rxjs",
     "tslib",
     "zone.js",
-    "moment"
+    "moment",
+    "angular-ng-autocomplete",
+    "angular-svg-icon"
     ]
 }

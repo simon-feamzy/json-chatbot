@@ -1,10 +1,16 @@
 import {Injectable} from '@angular/core';
 import * as moment from 'moment'
-import {Step, Script} from "../models/script";
-import {HttpClient} from '@angular/common/http';
+import {Script, Step} from "../models/script";
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {map} from 'rxjs/operators';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 
+const httpOptionsGet = {
+  headers: new HttpHeaders({
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Accept': 'application/json'
+  })
+};
 @Injectable({
   providedIn: 'root'
 })
@@ -25,6 +31,23 @@ export class UtilsService {
     let result= this.script?.children.filter(child => child.id == name)[0];
     // @ts-ignore
     return result;
+  }
+
+  getSelectData(url:string, searchTerm: string, searchTermMinLength: number): Observable<string[]> {
+
+    if (!searchTerm.trim() || searchTerm.length < searchTermMinLength) {
+      return of([]);
+    }
+    return this.httpClient.get(url + searchTerm, httpOptionsGet)
+      .pipe(
+        map((data: any) => {
+          debugger
+          if (data) {
+            return data?._embedded?.stringList.sort();
+          }
+          return [];
+        })
+      );
   }
 
   static getEpoch(): number {

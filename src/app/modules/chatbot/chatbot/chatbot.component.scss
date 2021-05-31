@@ -1,3 +1,9 @@
+.chatbot-content {
+  width: 100%;
+  overflow-y: auto;
+  margin-bottom: 60px;
+}
+
 .footer {
   position: absolute;
   bottom: 0;
@@ -8,18 +14,22 @@
   line-height: 60px;
   text-align: center;
   background-color: var(--chatbot-background);
+  display: flex;
+  align-items: center;
+  border-radius: 30px 30px 0px 0px !important;
 }
-.footer ion-buttons{
+
+.input-text, .input-button {
+  font-size: large;
   display: flex;
   justify-content: space-evenly;
   width: 100%;
-}
-.footer button{
-  font-size: large;
-}
-
-.input-text {
   margin: 0px;
   padding: 0px;
   width: 100%;
+}
+.chatbot-button{
+  line-height: 2;
+  border-radius: 15px;
+  padding: 0px 20px;
 }

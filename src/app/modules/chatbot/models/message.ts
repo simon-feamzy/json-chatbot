@@ -3,12 +3,14 @@ export class ChatMessage {
   author: string="";
   message: string="";
   epoch?: number;
+  timer:number=0;
 
-  constructor(type: MessageType, author: string, message: any, epoch: number) {
+  constructor(type: MessageType, author: string, message: any, epoch: number, timer: number) {
     this.type = type;
     this.author = author;
     this.message = message;
     this.epoch = epoch;
+    this.timer = timer;
   }
 }
 

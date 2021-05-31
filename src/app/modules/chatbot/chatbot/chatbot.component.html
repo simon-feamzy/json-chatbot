@@ -1,15 +1,29 @@
-<div>
+<div class="chatbot-content">
     <app-chat-bubble [chatMessage]="msg" *ngFor="let msg of messages"></app-chat-bubble>
 </div>
 
-<div class="footer ion-padding" >
+<div class="footer" >
     <div class="input-text" *ngIf="answerInput">
       <div item-content>
-        <input #txtInput [name]="content" />
-        <button icon-only (click)="sendMessage(currentMsg?.answerType, currentAnswers[0])">Envoyer</button>
+        <input #txtInput [name]="content" (keyup)="onKey(txtInput.value)" />
+        <button class="chatbot-button" (click)="sendMessage(currentMsg?.answerType, currentAnswers[0])">{{currentAnswers[0].text}}</button>
       </div>
     </div>
-    <div class="ion-margin" *ngIf="answerButton">
-      <button (click)="sendMessage(currentMsg?.answerType, button)" *ngFor="let button of currentAnswers">{{button.text}}</button>
+  <div class="input-select" *ngIf="answerSelect">
+    <div item-content>
+      <input #txtSelect name="content" (keyup)="tapSelect(txtSelect.value)"/>
+      <button class="chatbot-button" (click)="sendMessage(currentMsg?.answerType, currentAnswers[0])">{{currentAnswers[0].text}}</button>
     </div>
+  </div>
+    <div class="input-button" *ngIf="answerButton">
+      <button class="chatbot-button" (click)="sendMessage(currentMsg?.answerType, button)" *ngFor="let button of currentAnswers">{{button.text}}</button>
+    </div>
+
+  <ng-template #itemTemplate let-item>
+    <a [innerHTML]="item.name"></a>
+  </ng-template>
+
+  <ng-template #notFoundTemplate let-notFound>
+    <div [innerHTML]="notFound"></div>
+  </ng-template>
 </div>

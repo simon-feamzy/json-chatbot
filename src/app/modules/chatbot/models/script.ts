@@ -8,6 +8,8 @@ export class Step {
   text: string = "";
   answerType: AnswerType = AnswerType.BUTTON;
   answers: Answer[] = [];
+  timer: number = 0;
+  src: string=""
 }
 
 export class Answer {

@@ -5,21 +5,23 @@
       "id": "root",
       "text": "Hello !",
       "answerType": "BUTTON",
+      "timer": 1000,
       "answers": [
         {
-          "text": "ok",
+          "text": "Bonjour",
           "action": "action1"
         }
       ]
     },
     {
       "id": "action1",
-      "text": "Bien joué !",
+      "text": "C'est parti !",
+      "timer": 1500,
       "answerType": "BUTTON",
       "answers": [
         {
-          "text": "Au revoir",
-          "action": "bye"
+          "text": "select",
+          "action": "select"
         },
         {
           "text": "Continuer",
@@ -30,7 +32,33 @@
     {
       "id": "bye",
       "text": "Au revoir !",
-      "answerType": "close"
+      "timer": 1500,
+      "answerType": "CLOSE"
+    },
+    {
+      "id": "playagain",
+      "text": "Pouvez-vous saisir du texte",
+      "timer": 1500,
+      "answerType": "INPUT",
+      "answers": [
+        {
+          "text": "Envoyer",
+          "action": "select"
+        }
+      ]
+    },
+    {
+      "id": "select",
+      "text": "Sélectionner une ville",
+      "src": "https://api.staging.feamzy.com/v3/school/searchCity?page=0&size=15&city=",
+      "timer": 1500,
+      "answerType": "SELECT",
+      "answers": [
+        {
+          "text": "Envoyer",
+          "action": "validate"
+        }
+      ]
     }
   ]
 }
