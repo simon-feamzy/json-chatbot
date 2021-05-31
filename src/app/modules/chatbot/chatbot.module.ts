@@ -2,23 +2,21 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ChatBubbleComponent} from "./chat-bubble/chat-bubble.component";
 import {HttpClientModule} from '@angular/common/http';
-import {IonicChatbotComponent} from './ionic-chatbot/ionic-chatbot.component';
-import {IonicModule} from "@ionic/angular";
+import {ChatbotComponent} from './chatbot/chatbot.component';
 
 
 @NgModule({
   declarations: [
     ChatBubbleComponent,
-    IonicChatbotComponent
+    ChatbotComponent
   ],
   exports: [
     ChatBubbleComponent,
-    IonicChatbotComponent,
+    ChatbotComponent,
   ],
   imports: [
     CommonModule,
     HttpClientModule,
-    IonicModule,
     CommonModule,
   ]
 })

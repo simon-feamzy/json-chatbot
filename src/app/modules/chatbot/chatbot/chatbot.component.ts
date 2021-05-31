@@ -4,24 +4,23 @@ import {Answer, AnswerType, Step} from "../models/script";
 import {UtilsService} from "../services/utils.service";
 
 @Component({
-  selector: 'app-ionic-chatbot',
-  templateUrl: './ionic-chatbot.component.html',
-  styleUrls: ['./ionic-chatbot.component.scss']
+  selector: 'app-chatbot',
+  templateUrl: './chatbot.component.html',
+  styleUrls: ['./chatbot.component.scss']
 })
-export class IonicChatbotComponent implements OnInit {
+export class ChatbotComponent implements OnInit {
   @Input() botName: string = "bot";
   @Input() userName: string = "you";
   @Input() jsonFile: string = "";
   @Output() mapResult = new EventEmitter<ChatResponse>();
 
   messages: ChatMessage[] = [];
-  colorCode?: string
   content: any;
   currentMsg?: Step;
 
   answerInput: boolean = false;
   answerButton: boolean = false;
-  currentAnswers?: Answer[];
+  currentAnswers: Answer[] = [];
 
   constructor(private utilsService: UtilsService) {
   }
@@ -45,7 +44,7 @@ export class IonicChatbotComponent implements OnInit {
     }
   }
 
-  sendMessage(type: AnswerType, answer: Answer) {
+  sendMessage(type: AnswerType|undefined, answer: Answer) {
     console.debug("IonicChatbotComponent.sendMessage : " + answer);
     let msg: ChatMessage;
     if (type == AnswerType.INPUT) {

@@ -1,0 +1,15 @@
+<div>
+    <app-chat-bubble [chatMessage]="msg" *ngFor="let msg of messages"></app-chat-bubble>
+</div>
+
+<div class="footer ion-padding" >
+    <div class="input-text" *ngIf="answerInput">
+      <div item-content>
+        <input #txtInput [name]="content" />
+        <button icon-only (click)="sendMessage(currentMsg?.answerType, currentAnswers[0])">Envoyer</button>
+      </div>
+    </div>
+    <div class="ion-margin" *ngIf="answerButton">
+      <button (click)="sendMessage(currentMsg?.answerType, button)" *ngFor="let button of currentAnswers">{{button.text}}</button>
+    </div>
+</div>
