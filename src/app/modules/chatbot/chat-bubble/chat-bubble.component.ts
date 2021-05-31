@@ -1,7 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ChatMessage, MessageType} from "../models/message";
 import {UtilsService} from "../services/utils.service";
-import {faEllipsisH} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-chat-bubble',
@@ -10,7 +9,6 @@ import {faEllipsisH} from '@fortawesome/free-solid-svg-icons';
 })
 export class ChatBubbleComponent implements OnInit {
   @Input() chatMessage?: ChatMessage;
-  faEllipsisH = faEllipsisH;
   loading: boolean = false;
 
   constructor() {
