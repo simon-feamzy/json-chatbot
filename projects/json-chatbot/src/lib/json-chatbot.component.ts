@@ -7,13 +7,8 @@ import {catchError, debounceTime, distinctUntilChanged, switchMap, tap} from 'rx
 
 @Component({
   selector: 'lib-json-chatbot',
-  template: `
-    <p>
-      json-chatbot works!
-    </p>
-  `,
-  styles: [
-  ]
+  templateUrl: './json-chatbot.component.html',
+  styleUrls: ['./json-chatbot.component.scss']
 })
 export class JsonChatbotComponent implements OnInit {
   @Input() botName = 'bot';
