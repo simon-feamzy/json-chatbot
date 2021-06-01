@@ -5,9 +5,9 @@ name: Node.js CI chatbot
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, 10.x, 11.x ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, 10.x, 11.x ]
 
 jobs:
   build:
