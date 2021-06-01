@@ -16,9 +16,9 @@ jobs:
         with:
           node-version: 12
       - run: npm ci
-      - run: npm test
+      - run: npm build:ci
 
-  build-back:
+  build-pack:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -35,12 +35,9 @@ jobs:
       - run: npm run packagr
       - run: cd dist
       - run: npm pack
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
 
   publish:
-    needs: build
+    needs: build-pack
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -52,7 +49,7 @@ jobs:
           node-version: 12
           registry-url: https://registry.npmjs.org/
       - run: npm ci
-      - run: cd dist
+      - run: cd dist/json-chatbot
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
