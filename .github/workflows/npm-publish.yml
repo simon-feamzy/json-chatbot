@@ -5,7 +5,7 @@ name: Node.js Package
 
 on:
   release:
-    types: [created]
+    types: [created, updated]
 
 jobs:
   build:
@@ -15,29 +15,17 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 12
-      - run: npm ci
-      - run: npm build:ci
-
-  build-pack:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 12
-          registry-url: https://registry.npmjs.org/
       - uses: actions/upload-artifact@v2.2.3
         with:
           name: json-chatbot
           path: json-chatbot-*.tgz
       - run: npm ci
-      - run: npm run packagr
-      - run: cd dist
+      - run: npm run build:ci
+      - run: cd dist/json-chatbot
       - run: npm pack
 
   publish:
-    needs: build-pack
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: read

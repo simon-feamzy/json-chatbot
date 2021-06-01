@@ -5,9 +5,9 @@ name: Node.js CI chatbot
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, 10.x, 11.x ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, 10.x, 11.x ]
 
 jobs:
   build:
@@ -34,9 +34,35 @@ jobs:
       with:
         name: deploy_dist
         path: dist/json-chatbot
-#    - name: Archive code coverage result
-#      if: success()
-#      uses: actions/upload-artifact@v1
-#      with:
-#        name: deploy_coverage
-#        path: coverage
+
+  test:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 14.x, 15.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm ci
+    - run: npm run build:ci
+    - run: npm run test:ci
+
+    - name: Archive build
+      if: success()
+      uses: actions/upload-artifact@v1
+      with:
+        name: deploy_dist
+        path: dist/json-chatbot
+    - name: Archive code coverage result
+      if: success()
+      uses: actions/upload-artifact@v1
+      with:
+        name: deploy_coverage
+        path: coverage
