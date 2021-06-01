@@ -16,7 +16,6 @@ export class ChatBubbleComponent implements OnInit {
   constructor() {
   }
 
-
   ngOnInit(): void {
     if (this.chatMessage?.timer && this.chatMessage?.timer > 0) {
       this.loading = true;

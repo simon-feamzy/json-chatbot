@@ -18,5 +18,5 @@ export class Answer {
 }
 
 export enum AnswerType {
-  BUTTON = 'BUTTON', INPUT = 'INPUT', SELECT = 'SELECT', COMPONENT = 'COMPONENT'
+  BUTTON = 'BUTTON', INPUT = 'INPUT', SELECT = 'SELECT', COMPONENT = 'COMPONENT', CLOSE='CLOSE'
 }

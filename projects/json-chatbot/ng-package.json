@@ -7,7 +7,6 @@
   "assets": ["src/lib/assets"],
   "whitelistedNonPeerDependencies": [
     "angular-ng-autocomplete",
-    "angular-svg-icon",
     "moment"
   ]
 }

@@ -21,18 +21,21 @@
 }
 
 .input-text, .input-button, input-select {
-  font-size: large;
   display: flex;
   justify-content: space-evenly;
   width: 100%;
   margin: 0px;
   padding: 0px;
-  width: 100%;
 }
 .chatbot-button{
   line-height: 2;
   border-radius: 15px;
   padding: 0px 20px;
+}
+
+.input-text-content {
+  font-size: 14px;
+  line-height: 1.5em;
 }
 
 .input-select-content{

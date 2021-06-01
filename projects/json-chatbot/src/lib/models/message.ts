@@ -1,3 +1,5 @@
+import {AnswerType} from "./script";
+
 export class ChatMessage {
   type: MessageType = MessageType.MSG_REQ;
   author = '';
@@ -21,6 +23,7 @@ export class MessageType {
 }
 
 export class ChatResponse {
-  key = '';
+  action = '';
+  type: AnswerType;
   value = '';
 }

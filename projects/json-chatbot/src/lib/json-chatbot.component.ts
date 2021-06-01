@@ -17,6 +17,7 @@ export class JsonChatbotComponent implements OnInit {
   @Input() userIcon = '';
   @Input() jsonFile = '';
   @Input() withDate = false;
+  @Input() loaderIcon = '';
   @Output() mapResult = new EventEmitter<ChatResponse>();
 
   messages: ChatMessage[] = [];
@@ -49,6 +50,7 @@ export class JsonChatbotComponent implements OnInit {
     this.answerButton = false;
     this.answerInput = false;
     this.currentAnswers = [];
+    this.content = '';
   }
 
   displayStep(): void {
@@ -56,7 +58,7 @@ export class JsonChatbotComponent implements OnInit {
       JsonChatbotService.getEpoch(), this.currentMsg ? this.currentMsg.timer : 0);
     msg.avatar = this.botIcon;
     this.messages.push(msg);
-    if (this.currentMsg?.answerType === AnswerType.BUTTON) {
+    if (this.currentMsg?.answerType === AnswerType.BUTTON || this.currentMsg?.answerType === AnswerType.CLOSE) {
       this.answerButton = true;
       this.currentAnswers = this.currentMsg.answers;
     } else if (this.currentMsg?.answerType === AnswerType.INPUT) {
@@ -78,22 +80,41 @@ export class JsonChatbotComponent implements OnInit {
 
   sendMessage(type: AnswerType | undefined, answer: Answer): void {
     console.log('IonicChatbotComponent.sendMessage : ' + answer);
+
+    //   "id": "action2",
+    //     "text": "Ok, c'est bien compris. Je vous laisse inviter les membres de votre foyer pour vous organiser ensemble",
+    //     "answerType": "CLOSE",
+    //     "timer": 1000,
+    //     "answers": [
+    //     {
+    //       "text": "Continuer",
+    //       "action": "invit-parent"
+    //     }
+    //   ]
+    // },
+    const resp = new ChatResponse();
+    resp.action = answer.action;
+    resp.type = type;
+    resp.value = this.content;
+    this.mapResult.emit(resp);
     let msg: ChatMessage;
     if (type === AnswerType.INPUT) {
       msg = new ChatMessage(MessageType.MSG_REQ, this.userName, this.content, JsonChatbotService.getEpoch(), 0);
     } else if (type === AnswerType.SELECT) {
       msg = new ChatMessage(MessageType.MSG_REQ, this.userName, this.content, JsonChatbotService.getEpoch(), 0);
-    } else {//    if (type == AnswerType.BUTTON) {
+    } else if (type === AnswerType.BUTTON) {
       msg = new ChatMessage(MessageType.MSG_REQ, this.userName, answer.text, JsonChatbotService.getEpoch(), 0);
+    } else {
+      //type == CLOSE
     }
-    const resp = new ChatResponse();
-    resp.key = answer.action;
-    resp.value = this.content;
-    this.mapResult.emit(resp);
-    this.messages.push(msg);
+    if (msg) {
+      this.messages.push(msg);
+    }
     this.resetToolbar();
     this.currentMsg = this.utilsService.getNextStep(answer.action);
-    this.displayStep();
+    if (this.currentMsg) {
+      this.displayStep();
+    }
   }
 
   onKey(value: string): void {
