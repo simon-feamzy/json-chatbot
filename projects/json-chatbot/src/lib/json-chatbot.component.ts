@@ -59,6 +59,7 @@ export class JsonChatbotComponent implements OnInit {
   displayStep(): void {
     const msg = new ChatMessage(MessageType.MSG_RES, this.botName, this.currentMsg ? this.currentMsg.text : '',
       JsonChatbotService.getEpoch(), this.currentMsg ? this.currentMsg.timer : 0);
+    msg.avatar = this.botIcon;
     this.messages.push(msg);
     if (this.currentMsg?.answerType === AnswerType.BUTTON) {
       this.answerButton = true;

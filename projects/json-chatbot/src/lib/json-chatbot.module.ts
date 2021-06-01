@@ -6,6 +6,7 @@ import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {AngularSvgIconModule} from 'angular-svg-icon';
 import {AutocompleteLibModule} from 'angular-ng-autocomplete';
+import {AvatarModule} from "ngx-avatar";
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import {AutocompleteLibModule} from 'angular-ng-autocomplete';
     HttpClientModule,
     FormsModule,
     AngularSvgIconModule,
-    AutocompleteLibModule
+    AutocompleteLibModule,
+    AvatarModule
   ],
   exports: [
     JsonChatbotComponent,

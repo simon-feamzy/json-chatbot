@@ -1,11 +1,12 @@
 <div>
   <div class="chat-bubble {{getPosition()}}">
+    <ngx-avatar class="message-avatar-{{getPosition()}}" [src]="chatMessage.avatar" *ngIf="chatMessage.avatar && chatMessage.avatar.length > 0"></ngx-avatar>
     <div class="message-author">{{chatMessage?.author}}</div>
     <div class="message">
       <svg-icon [src]="ellipsis" [svgStyle]="{ 'width.px':40,'height.px':40 }" *ngIf="loading"></svg-icon>
       <span *ngIf="!loading">{{chatMessage?.message}}</span>
     </div>
-    <div class="message-detail">
+    <div class="message-detail" *ngIf="withDate">
       <span>{{formatEpoch(chatMessage?.epoch)}}</span>
     </div>
   </div>

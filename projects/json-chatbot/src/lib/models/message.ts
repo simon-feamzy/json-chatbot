@@ -4,6 +4,7 @@ export class ChatMessage {
   message = '';
   epoch?: number;
   timer = 0;
+  avatar = '';
 
   constructor(type: MessageType, author: string, message: any, epoch: number, timer: number) {
     this.type = type;

@@ -10,7 +10,8 @@ import {JsonChatbotService} from '../json-chatbot.service';
 export class ChatBubbleComponent implements OnInit {
   @Input() chatMessage?: ChatMessage;
   loading = false;
-  @Input() ellipsis = 'node_modules/json-chatbot/src/assets/icons/ellipsis.svg';
+  @Input() ellipsis = 'node_modules/json-chatbot/src/lib/assets/icons/ellipsis.svg';
+  @Input() withDate = false;
 
   constructor() {
   }
