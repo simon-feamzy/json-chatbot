@@ -1,0 +1,65 @@
+.message {
+  font-size: medium;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  text-align: left;
+}
+
+.message-author{
+  font-size: small;
+  font-style: italic;
+}
+.message-detail {
+  white-space: nowrap;
+  font-size: 12px;
+  padding-top: 5px;
+  float:right
+}
+
+.chat-bubble {
+  border-radius: 5px;
+  display: inline-block;
+  position: relative;
+  padding: 8px;
+  margin: 8px 12px;
+  max-width: 80%;
+  min-width: 51%;
+}
+
+.chat-bubble:before {
+  content: "\00a0";
+  display: block;
+  height: 13px;
+  width: 9px;
+  position: absolute;
+  bottom: -.5px;
+}
+
+.chat-bubble.left {
+  background-color: var(--chatbubble-left);
+  color: var(--chatbubble-left-contrast);
+  float: left;
+}
+
+.chat-bubble.right {
+  background-color: var(--chatbubble-right);
+  color: var(--chatbubble-right-contrast);
+  float: right;
+}
+
+.chat-bubble.left:before {
+  background-color: var(--chatbubble-left);
+  left: -4px;
+  border-bottom-right-radius: 100%;
+  border-top-left-radius: 50%;
+  -webkit-transform: rotate(70deg) skew(5deg);
+}
+
+.chat-bubble.right:before {
+  background-color: var(--chatbubble-right);
+  right: -4px;
+  border-bottom-left-radius: 50%;
+  border-top-right-radius: 100%;
+  -webkit-transform: rotate(118deg) skew(-5deg);
+}
+
