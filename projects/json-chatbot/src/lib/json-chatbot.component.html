@@ -3,8 +3,8 @@
 </div>
 
 <div class="footer">
-  <div *ngFor="let answer of currentAnswers">
-    <ng-template adHost *ngIf="answer?.answerType == 'COMPONENT'"></ng-template>
+  <ng-template adHost></ng-template>
+  <div *ngFor="let answer of currentAnswers" class="answer">
     <div class="input-text" *ngIf="answer?.answerType == 'INPUT'">
       <input #txtInput [name]="content" [(ngModel)]="content" (keyup)="onKey(txtInput.value)"
              class="input-text-content"/>

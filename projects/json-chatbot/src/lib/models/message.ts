@@ -7,6 +7,7 @@ export class ChatMessage {
   epoch?: number;
   timer = 0;
   avatar = '';
+  loading = false;
 
   constructor(type: MessageType, author: string, message: any, epoch: number, timer: number) {
     this.type = type;
@@ -14,6 +15,9 @@ export class ChatMessage {
     this.message = message;
     this.epoch = epoch;
     this.timer = timer;
+    if (this.timer>0){
+      this.loading = true;
+    }
   }
 }
 
@@ -26,4 +30,5 @@ export class ChatResponse {
   action = '';
   type: AnswerType;
   value = '';
+  args: [] = [];
 }

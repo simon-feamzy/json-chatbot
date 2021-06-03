@@ -9,7 +9,6 @@ import {JsonChatbotService} from '../json-chatbot.service';
 })
 export class ChatBubbleComponent implements OnInit {
   @Input() chatMessage?: ChatMessage;
-  loading = false;
   @Input() ellipsis = 'node_modules/json-chatbot/src/lib/assets/icons/ellipsis.svg';
   @Input() withDate = false;
 
@@ -17,14 +16,6 @@ export class ChatBubbleComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.chatMessage?.timer && this.chatMessage?.timer > 0) {
-      this.loading = true;
-      setTimeout(() => {
-        this.loading = false;
-      }, this.chatMessage.timer);
-    } else {
-      this.loading = false;
-    }
   }
 
   formatEpoch(epoch: number | undefined): string {

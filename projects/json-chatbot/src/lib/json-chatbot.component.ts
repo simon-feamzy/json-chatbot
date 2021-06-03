@@ -1,12 +1,12 @@
 import {
   Component,
+  ComponentFactory,
   ComponentFactoryResolver,
   EventEmitter,
   Input,
   OnInit,
   Output,
   SimpleChanges,
-  Type,
   ViewChild
 } from '@angular/core';
 import {ChatMessage, ChatResponse, MessageType} from './models/message';
@@ -15,7 +15,6 @@ import {JsonChatbotService} from './json-chatbot.service';
 import {of, Subject, Subscription} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, switchMap, tap} from 'rxjs/operators';
 import {ChatbotDirectiveComponent} from "./chatbot-directive.component";
-import {ScriptComponent} from "./interfaces/script.component";
 
 @Component({
   selector: 'lib-json-chatbot',
@@ -33,8 +32,9 @@ export class JsonChatbotComponent implements OnInit {
   @Input() error = '';
   @Input() componentInstances: Map<string, any> = new Map();
   @Output() mapResult = new EventEmitter<ChatResponse>();
+  args: [] = [];
 
-  @ViewChild(ChatbotDirectiveComponent, {static: true}) adHost!: ChatbotDirectiveComponent;
+  @ViewChild(ChatbotDirectiveComponent) adHost!: ChatbotDirectiveComponent;
 
   messages: ChatMessage[] = [];
   content: any;
@@ -63,6 +63,7 @@ export class JsonChatbotComponent implements OnInit {
   resetToolbar(): void {
     this.currentAnswers = [];
     this.content = '';
+    this.args = [];
   }
 
   displayStep(): void {
@@ -70,24 +71,30 @@ export class JsonChatbotComponent implements OnInit {
       JsonChatbotService.getEpoch(), this.currentMsg ? this.currentMsg.timer : 0);
     msg.avatar = this.botIcon;
     this.messages.push(msg);
-
-    this.currentAnswers = this.currentMsg.answers;
-
-    const answerComponent = this.currentMsg.answers.filter(answer => answer.answerType === AnswerType.COMPONENT);
-    if (answerComponent && answerComponent.length > 0) {
-      debugger
-      const componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.componentInstances[answerComponent[0].component]);
-
-      const viewContainerRef = this.adHost.viewContainerRef;
-      viewContainerRef.clear();
-
-      const componentRef = viewContainerRef.createComponent<any>(componentFactory);
-      if (answerComponent[0].component == 'InvitationCodeComponent') {
-        componentRef.instance.isFamilyManagment = false;
-        //componentRef.instance.validatedCodeEvent = false;
-        //componentRef.instance.childNameEvent = false;
+    setTimeout(() => {
+      msg.loading = false;
+      this.currentAnswers = this.currentMsg.answers;
+      const answerComponent = this.currentMsg.answers.filter(answer => answer.answerType === AnswerType.COMPONENT);
+      if (answerComponent && answerComponent.length > 0) {
+        const componentFactory: ComponentFactory<any> = this.componentFactoryResolver.resolveComponentFactory(this.componentInstances.get(answerComponent[0].component));
+        const viewContainerRef = this.adHost.viewContainerRef;
+        viewContainerRef.clear();
+        const componentRef = viewContainerRef.createComponent(componentFactory);
+        if (answerComponent[0].component == 'InvitationCodeComponent') {
+          componentRef.instance.isFamilyManagment = false;
+          componentRef.instance.invitationType.setValue('CL');
+          this.content = componentRef.instance.getInvitationCode();
+          componentRef.changeDetectorRef.detectChanges();
+          componentRef.instance.invitationCodeForm.get('childName').setValue()
+          let validatedCodeEvent: EventEmitter<string> = componentRef.instance.validatedCodeEvent;
+          this.args['validatedCodeEvent'] = validatedCodeEvent;
+          this.args['validatedCodeEvent'].subscribe(value => this.args['validatedCode'] = value);
+          let childNameEvent: EventEmitter<string> = componentRef.instance.childNameEvent;
+          this.args['childNameEvent'] = childNameEvent;
+          this.args['childNameEvent'].subscribe(value => this.args['childName'] = value);
+        }
       }
-    }
+    }, msg.timer);
     if (this.currentMsg?.src) {
       this.dataSubscription = this.dataSearchTerms.pipe(
         debounceTime(this.DEBOUNCE_TIME_IN_MS),
@@ -101,12 +108,13 @@ export class JsonChatbotComponent implements OnInit {
   }
 
   sendMessage(type: AnswerType | undefined, answer: Answer): void {
-    console.log('IonicChatbotComponent.sendMessage : ' + JSON.stringify(answer));
+    console.log('IonicChatbotComponent.sendMessage : ' + JSON.stringify(answer) + ', with content : ' + this.content);
 
     const resp = new ChatResponse();
     resp.action = answer.action;
     resp.type = type;
     resp.value = this.content;
+    resp.args = this.args;
     this.mapResult.emit(resp);
 
     let msg: ChatMessage;

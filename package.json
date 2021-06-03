@@ -21,7 +21,6 @@
     "@angular/platform-browser": "~11.2.14",
     "@angular/platform-browser-dynamic": "~11.2.14",
     "@angular/router": "~11.2.14",
-    "angular-ng-autocomplete": "^2.0.5",
     "moment": "^2.29.1",
     "ngx-avatar": "^4.1.0",
     "rxjs": "~6.5.5",

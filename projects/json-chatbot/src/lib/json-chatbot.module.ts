@@ -4,21 +4,20 @@ import {ChatBubbleComponent} from './chat-bubble/chat-bubble.component';
 import {CommonModule} from '@angular/common';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
-import {AutocompleteLibModule} from 'angular-ng-autocomplete';
 import {AvatarModule} from "ngx-avatar";
-import {JsonChatbotService} from "./json-chatbot.service";
+import {ChatbotDirectiveComponent} from "./chatbot-directive.component";
 
 
 @NgModule({
   declarations: [
     JsonChatbotComponent,
     ChatBubbleComponent,
+    ChatbotDirectiveComponent
   ],
   imports: [
     CommonModule,
     HttpClientModule,
     FormsModule,
-    AutocompleteLibModule,
     AvatarModule,
   ],
   exports: [
