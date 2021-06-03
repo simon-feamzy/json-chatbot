@@ -8,8 +8,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "build:ci": "ng build json-chatbot --prod",
-    "test:ci": "ng test json-chatbot --watch=false --code-coverage --source-map true --no-progress --browsers=ChromeHeadlessCI"
+    "build:ci": "ng build --prod",
+    "test:ci": "ng test --watch=false --code-coverage --source-map true --no-progress --browsers=ChromeHeadlessCI"
   },
   "private": true,
   "dependencies": {
