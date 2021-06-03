@@ -25,6 +25,7 @@ jobs:
           path: json-chatbot-*.tgz
       - run: npm ci
       - run: npm run build:ci  json-chatbot
+      - run: cat dist/json-chatbot/package.json
       - run: npm publish json-chatbot
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
