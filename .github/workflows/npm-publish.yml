@@ -8,19 +8,11 @@ on:
     types: [created]
 
 jobs:
-  build:
+  publish_json-chatbot:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 12
-      - run: npm ci
-      - run: npm build:ci
-
-  build-pack:
-    needs: build
-    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -32,24 +24,7 @@ jobs:
           name: json-chatbot
           path: json-chatbot-*.tgz
       - run: npm ci
-      - run: npm run packagr
-      - run: cd dist
-      - run: npm pack
-
-  publish:
-    needs: build-pack
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 12
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: cd dist/json-chatbot
-      - run: npm publish
+      - run: npm run build:ci  json-chatbot
+      - run: npm publish dist/json-chatbot/
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}

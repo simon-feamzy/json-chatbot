@@ -1,0 +1,60 @@
+.chatbot-content {
+  width: 100%;
+  overflow-y: auto;
+  margin-bottom: 60px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  min-height: 60px;
+  //line-height: 60px;
+  text-align: center;
+  background-color: var(--chatbot-background);
+  display: flex;
+  align-items: center;
+  border-radius: 30px 30px 0px 0px !important;
+  justify-content: space-around;
+}
+
+.answer {
+  display: flex;
+  justify-content: space-around;
+}
+
+.input-text, .input-button, input-select {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin: 0px 10px;
+  padding: 0px;
+}
+.chatbot-button{
+  line-height: 2;
+  border-radius: 15px;
+  margin: 0px 10px;
+  padding: 0px 20px;
+}
+
+.input-text-content {
+  font-size: 14px;
+  line-height: 1.5em;
+  border-radius: 20px;
+}
+
+.input-select-content{
+  background-color: var(--chatbubble-left-contrast);
+  color: var(--chatbubble-right-contrast);
+  line-height: 1.5em;
+  position: absolute;
+  bottom: 60px;
+  padding: 0px 20px;
+  border-color: var(--chatbubble-right);
+}
+
+.input-select-content a {
+  text-decoration: underline;
+}

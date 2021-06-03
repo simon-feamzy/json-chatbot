@@ -1,11 +1,9 @@
 {
   "name": "json-chatbot",
-  "version": "0.0.3",
+  "version": "11.0.0",
   "peerDependencies": {
     "@angular/common": "^10.0.5",
     "@angular/core": "^10.0.5",
-    "angular-ng-autocomplete": "^2.0.5",
-    "angular-svg-icon": "^11.2.0",
     "moment": "^2.29.1"
   },
   "dependencies": {

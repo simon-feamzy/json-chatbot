@@ -5,9 +5,7 @@
     "entryFile": "src/public-api.ts"
   },
   "assets": ["src/lib/assets"],
-  "whitelistedNonPeerDependencies": [
-    "angular-ng-autocomplete",
-    "angular-svg-icon",
+  "allowedNonPeerDependencies": [
     "moment"
   ]
 }
