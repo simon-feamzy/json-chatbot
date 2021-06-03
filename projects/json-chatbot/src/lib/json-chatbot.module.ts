@@ -6,6 +6,7 @@ import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {AutocompleteLibModule} from 'angular-ng-autocomplete';
 import {AvatarModule} from "ngx-avatar";
+import {JsonChatbotService} from "./json-chatbot.service";
 
 
 @NgModule({
@@ -22,11 +23,12 @@ import {AvatarModule} from "ngx-avatar";
   ],
   exports: [
     JsonChatbotComponent,
-    ChatBubbleComponent,
+    ChatBubbleComponent
   ],
   providers:[
 
   ]
 })
 export class JsonChatbotModule {
+
 }

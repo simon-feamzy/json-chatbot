@@ -1,9 +1,21 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {
+  Component,
+  ComponentFactoryResolver,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  SimpleChanges,
+  Type,
+  ViewChild
+} from '@angular/core';
 import {ChatMessage, ChatResponse, MessageType} from './models/message';
 import {Answer, AnswerType, Step} from './models/script';
 import {JsonChatbotService} from './json-chatbot.service';
 import {of, Subject, Subscription} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, switchMap, tap} from 'rxjs/operators';
+import {ChatbotDirectiveComponent} from "./chatbot-directive.component";
+import {ScriptComponent} from "./interfaces/script.component";
 
 @Component({
   selector: 'lib-json-chatbot',
@@ -18,15 +30,16 @@ export class JsonChatbotComponent implements OnInit {
   @Input() jsonFile = '';
   @Input() withDate = false;
   @Input() loaderIcon = '';
+  @Input() error = '';
+  @Input() componentInstances: Map<string, any> = new Map();
   @Output() mapResult = new EventEmitter<ChatResponse>();
+
+  @ViewChild(ChatbotDirectiveComponent, {static: true}) adHost!: ChatbotDirectiveComponent;
 
   messages: ChatMessage[] = [];
   content: any;
   currentMsg?: Step;
 
-  answerInput = false;
-  answerButton = false;
-  answerSelect = false;
   currentAnswers: Answer[] = [];
 
   dataSearchTerms: Subject<string> = new Subject<string>();
@@ -36,7 +49,8 @@ export class JsonChatbotComponent implements OnInit {
   readonly DEBOUNCE_TIME_IN_MS: number = 300;
   minChar = 3;
 
-  constructor(private utilsService: JsonChatbotService) {
+  constructor(private utilsService: JsonChatbotService,
+              private componentFactoryResolver: ComponentFactoryResolver) {
   }
 
   ngOnInit(): void {
@@ -47,8 +61,6 @@ export class JsonChatbotComponent implements OnInit {
   }
 
   resetToolbar(): void {
-    this.answerButton = false;
-    this.answerInput = false;
     this.currentAnswers = [];
     this.content = '';
   }
@@ -58,15 +70,25 @@ export class JsonChatbotComponent implements OnInit {
       JsonChatbotService.getEpoch(), this.currentMsg ? this.currentMsg.timer : 0);
     msg.avatar = this.botIcon;
     this.messages.push(msg);
-    if (this.currentMsg?.answerType === AnswerType.BUTTON || this.currentMsg?.answerType === AnswerType.CLOSE) {
-      this.answerButton = true;
-      this.currentAnswers = this.currentMsg.answers;
-    } else if (this.currentMsg?.answerType === AnswerType.INPUT) {
-      this.answerInput = true;
-      this.currentAnswers = this.currentMsg.answers;
-    } else if (this.currentMsg?.answerType === AnswerType.SELECT) {
-      this.answerSelect = true;
-      this.currentAnswers = this.currentMsg.answers;
+
+    this.currentAnswers = this.currentMsg.answers;
+
+    const answerComponent = this.currentMsg.answers.filter(answer => answer.answerType === AnswerType.COMPONENT);
+    if (answerComponent && answerComponent.length > 0) {
+      debugger
+      const componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.componentInstances[answerComponent[0].component]);
+
+      const viewContainerRef = this.adHost.viewContainerRef;
+      viewContainerRef.clear();
+
+      const componentRef = viewContainerRef.createComponent<any>(componentFactory);
+      if (answerComponent[0].component == 'InvitationCodeComponent') {
+        componentRef.instance.isFamilyManagment = false;
+        //componentRef.instance.validatedCodeEvent = false;
+        //componentRef.instance.childNameEvent = false;
+      }
+    }
+    if (this.currentMsg?.src) {
       this.dataSubscription = this.dataSearchTerms.pipe(
         debounceTime(this.DEBOUNCE_TIME_IN_MS),
         distinctUntilChanged(),
@@ -79,24 +101,14 @@ export class JsonChatbotComponent implements OnInit {
   }
 
   sendMessage(type: AnswerType | undefined, answer: Answer): void {
-    console.log('IonicChatbotComponent.sendMessage : ' + answer);
+    console.log('IonicChatbotComponent.sendMessage : ' + JSON.stringify(answer));
 
-    //   "id": "action2",
-    //     "text": "Ok, c'est bien compris. Je vous laisse inviter les membres de votre foyer pour vous organiser ensemble",
-    //     "answerType": "CLOSE",
-    //     "timer": 1000,
-    //     "answers": [
-    //     {
-    //       "text": "Continuer",
-    //       "action": "invit-parent"
-    //     }
-    //   ]
-    // },
     const resp = new ChatResponse();
     resp.action = answer.action;
     resp.type = type;
     resp.value = this.content;
     this.mapResult.emit(resp);
+
     let msg: ChatMessage;
     if (type === AnswerType.INPUT) {
       msg = new ChatMessage(MessageType.MSG_REQ, this.userName, this.content, JsonChatbotService.getEpoch(), 0);
@@ -114,6 +126,15 @@ export class JsonChatbotComponent implements OnInit {
     this.currentMsg = this.utilsService.getNextStep(answer.action);
     if (this.currentMsg) {
       this.displayStep();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    for (const propName in changes) {
+      const chng = changes[propName];
+      const cur = JSON.stringify(chng.currentValue);
+      const prev = JSON.stringify(chng.previousValue);
+      console.log(`${propName}: currentValue = ${cur}, previousValue = ${prev}`);
     }
   }
 
