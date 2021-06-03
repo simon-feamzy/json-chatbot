@@ -11,7 +11,7 @@
   width: 100%;
   /* Set the fixed height of the footer here */
   min-height: 60px;
-  line-height: 60px;
+  //line-height: 60px;
   text-align: center;
   background-color: var(--chatbot-background);
   display: flex;
@@ -20,19 +20,29 @@
   justify-content: space-around;
 }
 
-.input-text, .input-button, input-select {
-  font-size: large;
+.answer {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-around;
+}
+
+.input-text, .input-button, input-select {
+  display: flex;
+  justify-content: space-around;
   width: 100%;
-  margin: 0px;
+  margin: 0px 10px;
   padding: 0px;
-  width: 100%;
 }
 .chatbot-button{
   line-height: 2;
   border-radius: 15px;
+  margin: 0px 10px;
   padding: 0px 20px;
+}
+
+.input-text-content {
+  font-size: 14px;
+  line-height: 1.5em;
+  border-radius: 20px;
 }
 
 .input-select-content{

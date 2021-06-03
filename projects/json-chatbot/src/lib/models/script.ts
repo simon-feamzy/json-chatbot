@@ -6,7 +6,6 @@ export class Script {
 export class Step {
   id = '';
   text = '';
-  answerType: AnswerType = AnswerType.BUTTON;
   answers: Answer[] = [];
   timer = 0;
   src = '';
@@ -15,8 +14,13 @@ export class Step {
 export class Answer {
   text = '';
   action = '';
+  answerType: AnswerType = AnswerType.BUTTON;
+  checkUrl = '';
+  component?: string;
+
 }
 
 export enum AnswerType {
-  BUTTON = 'BUTTON', INPUT = 'INPUT', SELECT = 'SELECT', COMPONENT = 'COMPONENT'
+  BUTTON = 'BUTTON', INPUT = 'INPUT', SELECT = 'SELECT', COMPONENT = 'COMPONENT', CLOSE = 'CLOSE'
 }
+
