@@ -8,24 +8,7 @@ on:
     types: [created, updated]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 12
-      - uses: actions/upload-artifact@v2.2.3
-        with:
-          name: json-chatbot
-          path: json-chatbot-*.tgz
-      - run: npm ci
-      - run: npm run build:ci
-      - run: cd dist/json-chatbot
-      - run: npm pack
-
   publish:
-    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -36,8 +19,13 @@ jobs:
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org/
+      - uses: actions/upload-artifact@v2.2.3
+        with:
+          name: json-chatbot
+          path: json-chatbot-*.tgz
       - run: npm ci
-      - run: cd dist/json-chatbot
-      - run: npm publish
+      - run: npm run build:ci
+      - run: npm pack json-chatbot
+      - run: npm publish json-chatbot
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
