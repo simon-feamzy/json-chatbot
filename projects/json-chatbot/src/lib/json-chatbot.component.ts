@@ -15,6 +15,7 @@ import {JsonChatbotService} from './json-chatbot.service';
 import {of, Subject, Subscription} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, switchMap, tap} from 'rxjs/operators';
 import {ChatbotDirectiveComponent} from "./chatbot-directive.component";
+import {ScriptComponent} from "./interfaces/script.component";
 
 @Component({
   selector: 'lib-json-chatbot',
@@ -76,23 +77,24 @@ export class JsonChatbotComponent implements OnInit {
       this.currentAnswers = this.currentMsg.answers;
       const answerComponent = this.currentMsg.answers.filter(answer => answer.answerType === AnswerType.COMPONENT);
       if (answerComponent && answerComponent.length > 0) {
-        const componentFactory: ComponentFactory<any> = this.componentFactoryResolver.resolveComponentFactory(this.componentInstances.get(answerComponent[0].component));
+        const componentFactory: ComponentFactory<ScriptComponent> = this.componentFactoryResolver.resolveComponentFactory(this.componentInstances.get(answerComponent[0].component));
         const viewContainerRef = this.adHost.viewContainerRef;
         viewContainerRef.clear();
         const componentRef = viewContainerRef.createComponent(componentFactory);
+        componentRef.changeDetectorRef.detectChanges();
         if (answerComponent[0].component == 'InvitationCodeComponent') {
-          componentRef.instance.isFamilyManagment = false;
-          componentRef.instance.invitationType.setValue('CL');
-          this.content = componentRef.instance.getInvitationCode();
-          componentRef.changeDetectorRef.detectChanges();
-          componentRef.instance.invitationCodeForm.get('childName').setValue()
-          let validatedCodeEvent: EventEmitter<string> = componentRef.instance.validatedCodeEvent;
-          this.args['validatedCodeEvent'] = validatedCodeEvent;
-          this.args['validatedCodeEvent'].subscribe(value => this.args['validatedCode'] = value);
-          let childNameEvent: EventEmitter<string> = componentRef.instance.childNameEvent;
-          this.args['childNameEvent'] = childNameEvent;
-          this.args['childNameEvent'].subscribe(value => this.args['childName'] = value);
+          componentRef.instance.data = {isFamilyManagment: false, invitationType: 'CL'}
+          // this.content = componentRef.instance.getInvitationCode();
+          // componentRef.instance.invitationCodeForm.get('childName').setValue()
+          // let validatedCodeEvent: EventEmitter<string> = componentRef.instance.validatedCodeEvent;
+          // this.args['validatedCodeEvent'] = validatedCodeEvent;
+          // this.args['validatedCodeEvent'].subscribe(value => this.args['validatedCode'] = value);
+          // let childNameEvent: EventEmitter<string> = componentRef.instance.childNameEvent;
+          // this.args['childNameEvent'] = childNameEvent;
+          // this.args['childNameEvent'].subscribe(value => this.args['childName'] = value);
         }
+        componentRef.instance.init();
+        componentRef.instance.getResult().forEach(res => this.args[res.name]= res.value);
       }
     }, msg.timer);
     if (this.currentMsg?.src) {
