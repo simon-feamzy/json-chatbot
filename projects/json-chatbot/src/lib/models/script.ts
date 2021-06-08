@@ -1,6 +1,3 @@
-import {OnInit, Type} from "@angular/core";
-import {ScriptComponent} from "../interfaces/script.component";
-
 export class Script {
   root = '';
   children: Step[] = [];
@@ -16,7 +13,7 @@ export class Step {
 
 export class Answer {
   text = '';
-  action = '';
+  actions: Action[] = [];
   answerType: AnswerType = AnswerType.BUTTON;
   checkUrl = '';
   component?: string;
@@ -24,6 +21,10 @@ export class Answer {
 }
 
 export enum AnswerType {
-  BUTTON = 'BUTTON', INPUT = 'INPUT', SELECT = 'SELECT', COMPONENT = 'COMPONENT', CLOSE = 'CLOSE'
+  BUTTON = 'BUTTON', INPUT = 'INPUT', SELECT = 'SELECT', COMPONENT = 'COMPONENT', CLOSE = 'CLOSE',LINE_RETURN='LINE_RETURN'
 }
 
+export class Action{
+  next:string;
+  value:string;
+}

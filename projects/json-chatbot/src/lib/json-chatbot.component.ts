@@ -15,7 +15,7 @@ import {JsonChatbotService} from './json-chatbot.service';
 import {of, Subject, Subscription} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, switchMap, tap} from 'rxjs/operators';
 import {ChatbotDirectiveComponent} from "./chatbot-directive.component";
-import {ScriptComponent} from "./interfaces/script.component";
+import {ExecService, ScriptComponent} from "./interfaces/script.component";
 
 @Component({
   selector: 'lib-json-chatbot',
@@ -30,10 +30,10 @@ export class JsonChatbotComponent implements OnInit {
   @Input() jsonFile = '';
   @Input() withDate = false;
   @Input() loaderIcon = '';
-  @Input() error = '';
+  @Input() execService: ExecService;
   @Input() componentInstances: Map<string, any> = new Map();
   @Output() mapResult = new EventEmitter<ChatResponse>();
-  args: [] = [];
+  args: Map<string, string> = new Map();
 
   @ViewChild(ChatbotDirectiveComponent) adHost!: ChatbotDirectiveComponent;
 
@@ -49,6 +49,7 @@ export class JsonChatbotComponent implements OnInit {
   areDataLoading = false;
   readonly DEBOUNCE_TIME_IN_MS: number = 300;
   minChar = 3;
+  componentRef;
 
   constructor(private utilsService: JsonChatbotService,
               private componentFactoryResolver: ComponentFactoryResolver) {
@@ -59,12 +60,18 @@ export class JsonChatbotComponent implements OnInit {
       this.currentMsg = rootElt;
       this.displayStep();
     });
+    const componentFactory: ComponentFactory<ScriptComponent> = this.componentFactoryResolver.resolveComponentFactory(this.componentInstances.get("execComponent"));
+    const viewContainerRef = this.adHost.viewContainerRef;
+    viewContainerRef.clear();
+    const componentRef = viewContainerRef.createComponent(componentFactory);
+    componentRef.changeDetectorRef.detectChanges();
+    componentRef.instance.init();
+
   }
 
   resetToolbar(): void {
     this.currentAnswers = [];
     this.content = '';
-    this.args = [];
   }
 
   displayStep(): void {
@@ -82,19 +89,7 @@ export class JsonChatbotComponent implements OnInit {
         viewContainerRef.clear();
         const componentRef = viewContainerRef.createComponent(componentFactory);
         componentRef.changeDetectorRef.detectChanges();
-        if (answerComponent[0].component == 'InvitationCodeComponent') {
-          componentRef.instance.data = {isFamilyManagment: false, invitationType: 'CL'}
-          // this.content = componentRef.instance.getInvitationCode();
-          // componentRef.instance.invitationCodeForm.get('childName').setValue()
-          // let validatedCodeEvent: EventEmitter<string> = componentRef.instance.validatedCodeEvent;
-          // this.args['validatedCodeEvent'] = validatedCodeEvent;
-          // this.args['validatedCodeEvent'].subscribe(value => this.args['validatedCode'] = value);
-          // let childNameEvent: EventEmitter<string> = componentRef.instance.childNameEvent;
-          // this.args['childNameEvent'] = childNameEvent;
-          // this.args['childNameEvent'].subscribe(value => this.args['childName'] = value);
-        }
         componentRef.instance.init();
-        componentRef.instance.getResult().forEach(res => this.args[res.name]= res.value);
       }
     }, msg.timer);
     if (this.currentMsg?.src) {
@@ -109,16 +104,10 @@ export class JsonChatbotComponent implements OnInit {
     }
   }
 
-  sendMessage(type: AnswerType | undefined, answer: Answer): void {
+  async sendMessage(type: AnswerType | undefined, answer: Answer) {
     console.log('IonicChatbotComponent.sendMessage : ' + JSON.stringify(answer) + ', with content : ' + this.content);
-
-    const resp = new ChatResponse();
-    resp.action = answer.action;
-    resp.type = type;
-    resp.value = this.content;
-    resp.args = this.args;
-    this.mapResult.emit(resp);
-
+    this.args[this.currentMsg.id] = this.content;
+    // display user message
     let msg: ChatMessage;
     if (type === AnswerType.INPUT) {
       msg = new ChatMessage(MessageType.MSG_REQ, this.userName, this.content, JsonChatbotService.getEpoch(), 0);
@@ -132,11 +121,32 @@ export class JsonChatbotComponent implements OnInit {
     if (msg) {
       this.messages.push(msg);
     }
-    this.resetToolbar();
-    this.currentMsg = this.utilsService.getNextStep(answer.action);
-    if (this.currentMsg) {
-      this.displayStep();
-    }
+
+    // construct message send to execService
+    const resp = new ChatResponse();
+    resp.id = this.currentMsg.id;
+    resp.type = type;
+    resp.value = this.content;
+    resp.args = this.args;
+    resp.actions = answer.actions;
+    console.log('IonicChatbotComponent.execService.execute : ' + JSON.stringify(resp));
+
+    this.execService.execute(resp).then(result=>{
+      console.log("execService.execute : "+result);
+      const nextStep = answer.actions.find(action => {
+        const reg = new RegExp(action.value);
+        return reg.test(result);
+      }).next;
+
+
+      this.resetToolbar();
+      this.currentMsg = this.utilsService.getNextStep(nextStep);
+      if (this.currentMsg) {
+        this.displayStep();
+      }
+
+    });
+
   }
 
   ngOnChanges(changes: SimpleChanges) {

@@ -68,5 +68,14 @@ export class JsonChatbotService {
       );
   }
 
+  checkAnswer(url:string, param: string): Observable<boolean> {
+    const httpOptionsGet = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json'
+      }),
+    };
+    return this.httpClient.get<boolean>(url+param, httpOptionsGet);
+  }
 
 }

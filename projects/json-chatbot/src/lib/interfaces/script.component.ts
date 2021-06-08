@@ -1,5 +1,6 @@
 // use by component to add it in footer
 import {EventEmitter} from "@angular/core";
+import {ChatResponse} from "../models/message";
 
 export declare interface ScriptComponent {
   data: any;
@@ -10,4 +11,8 @@ export declare interface ScriptComponent {
 export class ScriptComponentResult{
   name:string;
   value: EventEmitter<string>;
+}
+
+export declare interface ExecService{
+  execute(resp : ChatResponse): Promise<string>
 }
