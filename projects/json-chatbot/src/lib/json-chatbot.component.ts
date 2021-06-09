@@ -60,13 +60,6 @@ export class JsonChatbotComponent implements OnInit {
       this.currentMsg = rootElt;
       this.displayStep();
     });
-    const componentFactory: ComponentFactory<ScriptComponent> = this.componentFactoryResolver.resolveComponentFactory(this.componentInstances.get("execComponent"));
-    const viewContainerRef = this.adHost.viewContainerRef;
-    viewContainerRef.clear();
-    const componentRef = viewContainerRef.createComponent(componentFactory);
-    componentRef.changeDetectorRef.detectChanges();
-    componentRef.instance.init();
-
   }
 
   resetToolbar(): void {
