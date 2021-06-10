@@ -2,11 +2,7 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.0.4.
 
-This project contains the library json-chatbot. This library allow to display chat and interact with user with button or input text. All response are send to parent component.
-
-The chat bubble can contain a loader svg. This svg est load by the registry with the name 'ellipsis'.
-
-data are loaded from json file. TODO
+This project contains the library [json-chatbot](./projects/json-chatbot/README.md). 
 
 
 ## Development server

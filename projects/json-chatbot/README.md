@@ -1,24 +1,30 @@
 # JsonChatbot
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.0.5.
+This library allow to display chat and interact with user with button or input text. All response can be sent to a service.
 
-## Code scaffolding
 
-Run `ng generate component component-name --project json-chatbot` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project json-chatbot`.
-> Note: Don't forget to add `--project json-chatbot` or else it will be added to the default project in your `angular.json` file. 
+Data are loaded from json file. 
 
-## Build
+ex: 
+`{"root": "root",
+"children": [
+{
+"id": "root",
+"text": "Bonjour ! je suis Sam, votre assistant :-) Je vais vous guider ","timer": 500,
+"answers": [
+{"text": "Ok","actions": [{"value": ".*","next": "step2"}],"answerType": "BUTTON"},
+{"text": "Non","actions": [{"value": ".*","next": "step3"}],"answerType": "BUTTON"}
+]},
+{"id":"step2",
+...}`
 
-Run `ng build json-chatbot` to build the project. The build artifacts will be stored in the `dist/` directory.
+The JSON file contains an array named children of type `Step`. Each step contains an `id` (must be unique),
+a `text` (display in bubble), a timer (duration of loader display) and an `answers` array. A step can also contains a `src` to retrieve data to display as list.
 
-## Publishing
+Each `answer` has a type (BUTTON, INPUT, SELECT, COMPONENT, CLOSE). 
 
-After building your library with `ng build json-chatbot`, go to the dist folder `cd dist/json-chatbot` and run `npm publish`.
+TODO to complete
 
-## Running unit tests
+All types are described in [script.js](./src/lib/models/script.js).
 
-Run `ng test json-chatbot` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+The chat bubble can contain a loader svg.

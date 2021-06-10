@@ -61,21 +61,22 @@ export class JsonChatbotService {
       .pipe(
         map((data: any) => {
           if (data) {
-            return data?._embedded?.stringList.sort();
+            var lst: string[] = data?._embedded?.stringList.sort();
+            return lst;
           }
           return [];
         })
       );
   }
 
-  checkAnswer(url:string, param: string): Observable<boolean> {
+  checkAnswer(url: string, param: string): Observable<boolean> {
     const httpOptionsGet = {
       headers: new HttpHeaders({
         'Content-Type': 'application/x-www-form-urlencoded',
         'Accept': 'application/json'
       }),
     };
-    return this.httpClient.get<boolean>(url+param, httpOptionsGet);
+    return this.httpClient.get<boolean>(url + param, httpOptionsGet);
   }
 
 }

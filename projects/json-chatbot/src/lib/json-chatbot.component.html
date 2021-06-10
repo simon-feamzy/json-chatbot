@@ -2,8 +2,8 @@
   <lib-chat-bubble [chatMessage]="msg" *ngFor="let msg of messages" [ellipsis]="loaderIcon"></lib-chat-bubble>
 </div>
 
-<div class="footer">
-  <div class="answer"><ng-template adHost></ng-template></div>
+<div class="footer" role="footer">
+  <div class="answer" *ngIf="hasComponent()"><ng-template adHost></ng-template></div>
 
   <div *ngFor="let answer of currentAnswers">
     <div class="input-text" *ngIf="answer?.answerType == 'INPUT'">
@@ -14,7 +14,15 @@
     <div class="input-select" *ngIf="answer?.answerType == 'SELECT'">
       <div item-content>
         <div class="input-select-content" *ngIf="data">
-          <div *ngFor="let item of data"><a (click)="onKey(item);tapSelect(item)">{{item}}</a></div>
+          <div *ngFor="let item of data">
+            <a (click)="selectContent(item)">{{item}}</a>
+          </div>
+          <div *ngIf="data.length > 0">
+            <span> ----- </span>
+          </div>
+          <div *ngIf="data.length > 0">
+            <a (click)="selectContent(unknowItemKey)">{{unknowItem}}</a>
+          </div>
         </div>
         <input #txtSelect name="content" [(ngModel)]="content" (keyup)="tapSelect(txtSelect.value)"/>
         <button class="chatbot-button" (click)="sendMessage(answer?.answerType, answer)">{{answer.text}}</button>

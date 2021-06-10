@@ -6,7 +6,6 @@ import {
   Input,
   OnInit,
   Output,
-  SimpleChanges,
   ViewChild
 } from '@angular/core';
 import {ChatMessage, ChatResponse, MessageType} from './models/message';
@@ -49,7 +48,10 @@ export class JsonChatbotComponent implements OnInit {
   areDataLoading = false;
   readonly DEBOUNCE_TIME_IN_MS: number = 300;
   minChar = 3;
-  componentRef;
+  public static UNKNOW_ITEM_KEY = "not-found";
+  public static UNKNOW_ITEM = "Je ne trouve pas";
+  unknowItem = JsonChatbotComponent.UNKNOW_ITEM;
+  unknowItemKey = JsonChatbotComponent.UNKNOW_ITEM_KEY;
 
   constructor(private utilsService: JsonChatbotService,
               private componentFactoryResolver: ComponentFactoryResolver) {
@@ -86,12 +88,20 @@ export class JsonChatbotComponent implements OnInit {
       }
     }, msg.timer);
     if (this.currentMsg?.src) {
+
+      const url = this.currentMsg.src.replace(/<([a-zA-Z0-9\-_]+)>/, this.args["$1"])
+      console.log("url source : " + url);
       this.dataSubscription = this.dataSearchTerms.pipe(
         debounceTime(this.DEBOUNCE_TIME_IN_MS),
         distinctUntilChanged(),
         tap(() => this.areDataLoading = true),
-        switchMap((term: string) => this.utilsService.getSelectData(this.currentMsg ? this.currentMsg.src : '', term, this.minChar)),
+        switchMap((term: string) => this.utilsService.getSelectData(url, term, this.minChar)),
         catchError(() => of([])),
+        // map(lst => {
+        //   lst.push(JsonChatbotService.SEPARATOR_ITEM);
+        //   lst.push(JsonChatbotService.UNKNOW_ITEM)
+        //   return lst;
+        // }),
         tap(() => this.areDataLoading = false)
       ).subscribe((data => this.data = data));
     }
@@ -99,15 +109,23 @@ export class JsonChatbotComponent implements OnInit {
 
   async sendMessage(type: AnswerType | undefined, answer: Answer) {
     console.log('IonicChatbotComponent.sendMessage : ' + JSON.stringify(answer) + ', with content : ' + this.content);
-    this.args[this.currentMsg.id] = this.content;
+    this.args.set(this.currentMsg.id, this.content);
     // display user message
     let msg: ChatMessage;
     if (type === AnswerType.INPUT) {
       msg = new ChatMessage(MessageType.MSG_REQ, this.userName, this.content, JsonChatbotService.getEpoch(), 0);
     } else if (type === AnswerType.SELECT) {
-      msg = new ChatMessage(MessageType.MSG_REQ, this.userName, this.content, JsonChatbotService.getEpoch(), 0);
+      var label: string = this.content;
+      if (label === JsonChatbotComponent.UNKNOW_ITEM_KEY) {
+        label = JsonChatbotComponent.UNKNOW_ITEM;
+      }
+      msg = new ChatMessage(MessageType.MSG_REQ, this.userName, label, JsonChatbotService.getEpoch(), 0);
     } else if (type === AnswerType.BUTTON) {
-      msg = new ChatMessage(MessageType.MSG_REQ, this.userName, answer.text, JsonChatbotService.getEpoch(), 0);
+      var label: string = answer.text;
+      if (label === JsonChatbotComponent.UNKNOW_ITEM_KEY) {
+        label = JsonChatbotComponent.UNKNOW_ITEM;
+      }
+      msg = new ChatMessage(MessageType.MSG_REQ, this.userName, label, JsonChatbotService.getEpoch(), 0);
     } else {
       //type == CLOSE
     }
@@ -124,8 +142,8 @@ export class JsonChatbotComponent implements OnInit {
     resp.actions = answer.actions;
     console.log('IonicChatbotComponent.execService.execute : ' + JSON.stringify(resp));
 
-    this.execService.execute(resp).then(result=>{
-      console.log("execService.execute : "+result);
+    this.execService.execute(resp).then(result => {
+      console.log("execService.execute : " + result);
       const nextStep = answer.actions.find(action => {
         const reg = new RegExp(action.value);
         return reg.test(result);
@@ -142,21 +160,20 @@ export class JsonChatbotComponent implements OnInit {
 
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    for (const propName in changes) {
-      const chng = changes[propName];
-      const cur = JSON.stringify(chng.currentValue);
-      const prev = JSON.stringify(chng.previousValue);
-      console.log(`${propName}: currentValue = ${cur}, previousValue = ${prev}`);
-    }
-  }
-
   onKey(value: string): void {
     this.content = value;
+  }
+
+  selectContent(value: string): void {
+    this.content = value;
+    this.data = [];
   }
 
   tapSelect(value: string): void {
     this.dataSearchTerms.next(value);
   }
 
+  hasComponent(): boolean {
+    return this.currentMsg?.answers?.filter(answer => answer.answerType === AnswerType.COMPONENT).length > 0;
+  }
 }
