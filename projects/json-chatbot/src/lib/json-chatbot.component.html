@@ -1,9 +1,10 @@
-<div class="chatbot-content">
-  <lib-chat-bubble [chatMessage]="msg" *ngFor="let msg of messages" [ellipsis]="loaderIcon"></lib-chat-bubble>
-</div>
+<div class="chatbot">
+  <div #chatbotContent class="chatbot-content">
+    <lib-chat-bubble [chatMessage]="msg" *ngFor="let msg of messages" [ellipsis]="loaderIcon"></lib-chat-bubble>
+  </div>
 
-<div class="footer" role="footer">
-  <div class="answer" *ngIf="hasComponent()">
+<div class="chatbot-footer" role="footer">
+  <div *ngIf="hasComponent()">
     <ng-template adHost></ng-template>
   </div>
 
@@ -41,12 +42,10 @@
             <a (click)="selectContent(unknowItemKey)">{{unknowItem}}</a>
           </div>
         </div>
-        <input #txtSelect name="content" [(ngModel)]="content" (keyup)="tapSelect(txtSelect.value)"/>
+      </div>
+      <div class="input-button" *ngIf="answer?.answerType == 'BUTTON' || answer?.answerType == 'CLOSE'">
         <button class="chatbot-button" (click)="sendMessage(answer?.answerType, answer)">{{answer.text}}</button>
       </div>
-    </div>
-    <div class="input-button" *ngIf="answer?.answerType == 'BUTTON' || answer?.answerType == 'CLOSE'">
-      <button class="chatbot-button" (click)="sendMessage(answer?.answerType, answer)">{{answer.text}}</button>
     </div>
   </div>
 </div>
