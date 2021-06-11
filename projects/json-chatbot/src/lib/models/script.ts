@@ -8,11 +8,15 @@ export class Step {
   text = '';
   answers: Answer[] = [];
   timer = 0;
-  src = '';
-  srcId = '';
-  srcLabel = '';
-  staticSrcData='';
-  staticSrc='';
+  src:Source;
+}
+
+export class Source {
+  url = '';
+  path = '';
+  static = false;
+  id = '';
+  label = '';
 }
 
 export class Answer {
@@ -25,10 +29,10 @@ export class Answer {
 }
 
 export enum AnswerType {
-  BUTTON = 'BUTTON', INPUT = 'INPUT', SELECT = 'SELECT', COMPONENT = 'COMPONENT', CLOSE = 'CLOSE'
+  BUTTON = 'BUTTON', INPUT = 'INPUT', SELECT = 'SELECT', AUTOCOMPLETE = 'AUTOCOMPLETE', COMPONENT = 'COMPONENT', CLOSE = 'CLOSE'
 }
 
-export class Action{
-  next:string;
-  value:string;
+export class Action {
+  next: string;
+  value: string;
 }

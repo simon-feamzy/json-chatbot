@@ -14,12 +14,25 @@
       <button class="chatbot-button" (click)="sendMessage(answer?.answerType, answer)">{{answer.text}}</button>
     </div>
     <div class="input-select" *ngIf="answer?.answerType == 'SELECT'">
+      <select [(ngModel)]="content" *ngIf="!currentMsg.src || !currentMsg.src.label || currentMsg.src.label.length == 0">
+        <option *ngFor="let item of data | async" (click)="selectContent(item)">{{item}}</option>
+        <option> ----- </option>
+        <option (click)="selectContent(unknowItemKey)">{{unknowItem}}</option>
+      </select>
+      <select [(ngModel)]="content" *ngIf="currentMsg.src?.label?.length > 0">
+        <option *ngFor="let item of data | async" (click)="selectContent(item)">{{item[currentMsg.src.label]}}</option>
+        <option> ----- </option>
+        <option (click)="selectContent(unknowItemKey)">{{unknowItem}}</option>
+      </select>
+      <button class="chatbot-button" (click)="sendMessage(answer?.answerType, answer)">{{answer.text}}</button>
+    </div>
+    <div class="input-select" *ngIf="answer?.answerType == 'AUTOCOMPLETE'">
       <div item-content>
         <div class="input-select-content" *ngIf="data">
           <div *ngFor="let item of data | async">
-            <a (click)="selectContent(item)" *ngIf="!currentMsg.srcLabel || currentMsg.srcLabel == ''">{{item}}</a>
+            <a (click)="selectContent(item)" *ngIf="!currentMsg.src || !currentMsg.src.label || currentMsg.src.label.length == 0">{{item}}</a>
             <a (click)="selectContent(item)"
-               *ngIf="currentMsg.srcLabel && currentMsg.srcLabel!=''">{{item[currentMsg.srcLabel]}}</a>
+               *ngIf="currentMsg.src?.label?.length > 0">{{item[currentMsg.src.label]}}</a>
           </div>
           <div *ngIf="hasDataContent">
             <span> ----- </span>

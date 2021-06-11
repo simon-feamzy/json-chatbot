@@ -102,11 +102,8 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
     }, msg.timer);
 
     // if select content is loaded from url, subscribe to this url to get data
-    if (this.currentMsg?.src || this.currentMsg?.staticSrcData) {
-      var url = this.currentMsg.src;
-      if (this.currentMsg?.staticSrc) {
-        url = this.currentMsg?.staticSrc;
-      }
+    if (this.currentMsg?.src) {
+      var url = this.currentMsg.src.url;
 
       // replace variable in url from args values
       const reg = new RegExp("<([a-zA-Z0-9\\-_]+)>");
@@ -117,39 +114,43 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
       console.log("url source : " + url);
       this.dataSubscription.unsubscribe();
       this.dataSearchTerms = new ReplaySubject(3);
-      // this.subscription = this.dataSearchTerms.subscribe(this.destination);
-      this.dataSubscription = this.dataSearchTerms.pipe(
-        debounceTime(this.DEBOUNCE_TIME_IN_MS),
-        distinctUntilChanged(),
-        tap(() => this.areDataLoading = true),
-        switchMap((term: string) => {
-          if (this.currentMsg?.staticSrc) {
-            return this.utilsService.getStaticSelectData(url, this.currentMsg.staticSrcData);
+      if (this.currentMsg?.src.static) {
+        this.utilsService.getStaticSelectData(url, this.currentMsg.src.path).subscribe(data => {
+          this.data.next(data);
+        });
+      } else {
+        this.dataSubscription = this.dataSearchTerms.pipe(
+          debounceTime(this.DEBOUNCE_TIME_IN_MS),
+          distinctUntilChanged(),
+          tap(() => this.areDataLoading = true),
+          switchMap((term: string) => {
+            if (this.currentMsg?.src.static) {
+              return this.utilsService.getStaticSelectData(url, this.currentMsg.src.path);
+            } else {
+              return this.utilsService.getSelectData(url, term, this.MIN_CHAR);
+            }
+          }),
+          catchError((error) => {
+            console.log(error);
+            return of([])
+          }),
+          tap(() => this.areDataLoading = false)
+        ).subscribe(data => {
+          this.data.next(data);
+          // specify if data has content
+          if (data.length > 0) {
+            this.hasDataContent = true;
           } else {
-            return this.utilsService.getSelectData(url, term, this.MIN_CHAR);
+            this.hasDataContent = false;
           }
-        }),
-        catchError((error) => {
-          console.log(error);
-          return of([])
-        }),
-        tap(() => this.areDataLoading = false)
-      ).subscribe(data => {
-        this.data.next(data);
-        // specify if data has content
-        if (data.length > 0) {
-          this.hasDataContent = true;
-        } else {
-          this.hasDataContent = false;
-        }
-      });
-
+        });
+      }
     }
   }
 
   async sendMessage(type: AnswerType | undefined, answer: Answer) {
     console.log('IonicChatbotComponent.sendMessage : ' + JSON.stringify(answer) + ', with content : ' + this.content);
-    if (answer.answerType === AnswerType.SELECT && this.currentMsg.srcId && this.currentMsg.srcId.length > 0) {
+    if ((answer.answerType === AnswerType.SELECT || answer.answerType === AnswerType.AUTOCOMPLETE) && this.currentMsg.src?.id?.length > 0) {
       this.args.set(this.currentMsg.id, this.selectedContent.id);
     } else {
       this.args.set(this.currentMsg.id, this.content);
@@ -158,7 +159,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
     let msg: ChatMessage;
     if (type === AnswerType.INPUT) {
       msg = new ChatMessage(MessageType.MSG_REQ, this.userName, this.content, JsonChatbotService.getEpoch(), 0);
-    } else if (type === AnswerType.SELECT) {
+    } else if (type === AnswerType.SELECT || type === AnswerType.AUTOCOMPLETE) {
       var label: string = this.content;
       if (label === JsonChatbotComponent.UNKNOW_ITEM_KEY) {
         label = JsonChatbotComponent.UNKNOW_ITEM;
@@ -181,7 +182,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
     const resp = new ChatResponse();
     resp.id = this.currentMsg.id;
     resp.type = type;
-    if (answer.answerType === AnswerType.SELECT && this.currentMsg.srcId && this.currentMsg.srcId.length > 0) {
+    if (answer.answerType === AnswerType.SELECT && this.currentMsg.src?.id?.length > 0) {
       resp.value = this.selectedContent;
     } else {
       resp.value = this.content;
@@ -213,10 +214,10 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
   }
 
   selectContent(value: any): void {
-    if (this.currentMsg.srcId && this.currentMsg.srcId.length > 0) {
-      this.selectedContent.id = value[this.currentMsg.srcId];
-      this.selectedContent.label = value[this.currentMsg.srcLabel];
-      this.content = value[this.currentMsg.srcLabel];
+    if (this.currentMsg.src?.id?.length > 0) {
+      this.selectedContent.id = value[this.currentMsg.src?.id];
+      this.selectedContent.label = value[this.currentMsg.src.label];
+      this.content = value[this.currentMsg.src?.label];
     } else {
       this.content = value;
     }
