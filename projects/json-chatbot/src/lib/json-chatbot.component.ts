@@ -2,6 +2,7 @@ import {
   Component,
   ComponentFactory,
   ComponentFactoryResolver,
+  ElementRef,
   EventEmitter,
   Input,
   OnDestroy,
@@ -25,7 +26,7 @@ import {ExecService, ScriptComponent} from "./interfaces/script.component";
 export class JsonChatbotComponent implements OnInit, OnDestroy {
   @Input() botName = 'bot';
   @Input() botIcon = '';
-  @Input() userName = 'you';
+  @Input() userName = '';
   @Input() userIcon = '';
   @Input() jsonFile = '';
   @Input() withDate = false;
@@ -33,6 +34,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
   @Input() execService: ExecService;
   @Input() componentInstances: Map<string, any> = new Map();
   @Output() mapResult = new EventEmitter<ChatResponse>();
+  @ViewChild('chatbotContent', { static: false }) chatbotContent: ElementRef;
   @ViewChild(ChatbotDirectiveComponent) adHost!: ChatbotDirectiveComponent;
 
   args: Map<string, any> = new Map();
@@ -207,6 +209,18 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
 
     });
 
+  }
+
+  scrollToBottom() {
+    this.chatbotContent.nativeElement.scroll({
+      top: this.chatbotContent.nativeElement.scrollHeight,
+      left: 0,
+      behavior: 'smooth'
+    });
+  }
+
+  ngAfterViewChecked() {
+    this.scrollToBottom();
   }
 
   onKey(value: string): void {
