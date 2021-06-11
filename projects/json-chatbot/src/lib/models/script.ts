@@ -9,6 +9,10 @@ export class Step {
   answers: Answer[] = [];
   timer = 0;
   src = '';
+  srcId = '';
+  srcLabel = '';
+  staticSrcData='';
+  staticSrc='';
 }
 
 export class Answer {
@@ -21,7 +25,7 @@ export class Answer {
 }
 
 export enum AnswerType {
-  BUTTON = 'BUTTON', INPUT = 'INPUT', SELECT = 'SELECT', COMPONENT = 'COMPONENT', CLOSE = 'CLOSE',LINE_RETURN='LINE_RETURN'
+  BUTTON = 'BUTTON', INPUT = 'INPUT', SELECT = 'SELECT', COMPONENT = 'COMPONENT', CLOSE = 'CLOSE'
 }
 
 export class Action{

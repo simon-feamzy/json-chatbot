@@ -52,7 +52,22 @@ export class JsonChatbotService {
     return result;
   }
 
-  getSelectData(url: string, searchTerm: string, searchTermMinLength: number): Observable<string[]> {
+  getStaticSelectData(url: string, field:string): Observable<any[]> {
+
+    return this.httpClient.get(url, httpOptionsGet)
+      .pipe(
+        map((data: any) => {
+          if (data) {
+            var lst: string[] = data[field].sort();
+            // lst.filter()
+            return lst;
+          }
+          return [];
+        })
+      );
+  }
+
+  getSelectData(url: string, searchTerm: string, searchTermMinLength: number): Observable<any[]> {
 
     if (!searchTerm.trim() || searchTerm.length < searchTermMinLength) {
       return of([]);
@@ -61,7 +76,7 @@ export class JsonChatbotService {
       .pipe(
         map((data: any) => {
           if (data) {
-            var lst: string[] = data?._embedded?.stringList.sort();
+            var lst: string[] = data._embedded[Object.keys(data._embedded)[0]].sort();
             return lst;
           }
           return [];

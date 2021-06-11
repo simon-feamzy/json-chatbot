@@ -6,6 +6,7 @@ import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {AvatarModule} from "ngx-avatar";
 import {ChatbotDirectiveComponent} from "./chatbot-directive.component";
+import {NgObjectPipesModule, NgPipesModule} from "ngx-pipes";
 
 
 @NgModule({
@@ -19,6 +20,8 @@ import {ChatbotDirectiveComponent} from "./chatbot-directive.component";
     HttpClientModule,
     FormsModule,
     AvatarModule,
+    NgObjectPipesModule,
+    NgPipesModule,
   ],
   exports: [
     JsonChatbotComponent,

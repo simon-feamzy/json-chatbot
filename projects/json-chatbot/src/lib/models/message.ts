@@ -29,7 +29,7 @@ export class MessageType {
 export class ChatResponse {
   id = '';
   type: AnswerType;
-  value = '';
+  value:any;
   args: Map<string, string>;
   actions: Action[] = [];
 }

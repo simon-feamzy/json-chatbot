@@ -3,7 +3,9 @@
 </div>
 
 <div class="footer" role="footer">
-  <div class="answer" *ngIf="hasComponent()"><ng-template adHost></ng-template></div>
+  <div class="answer" *ngIf="hasComponent()">
+    <ng-template adHost></ng-template>
+  </div>
 
   <div *ngFor="let answer of currentAnswers">
     <div class="input-text" *ngIf="answer?.answerType == 'INPUT'">
@@ -14,13 +16,15 @@
     <div class="input-select" *ngIf="answer?.answerType == 'SELECT'">
       <div item-content>
         <div class="input-select-content" *ngIf="data">
-          <div *ngFor="let item of data">
-            <a (click)="selectContent(item)">{{item}}</a>
+          <div *ngFor="let item of data | async">
+            <a (click)="selectContent(item)" *ngIf="!currentMsg.srcLabel || currentMsg.srcLabel == ''">{{item}}</a>
+            <a (click)="selectContent(item)"
+               *ngIf="currentMsg.srcLabel && currentMsg.srcLabel!=''">{{item[currentMsg.srcLabel]}}</a>
           </div>
-          <div *ngIf="data.length > 0">
+          <div *ngIf="hasDataContent">
             <span> ----- </span>
           </div>
-          <div *ngIf="data.length > 0">
+          <div *ngIf="hasDataContent">
             <a (click)="selectContent(unknowItemKey)">{{unknowItem}}</a>
           </div>
         </div>
