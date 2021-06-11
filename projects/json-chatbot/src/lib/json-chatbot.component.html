@@ -43,9 +43,9 @@
           </div>
         </div>
       </div>
-      <div class="input-button" *ngIf="answer?.answerType == 'BUTTON' || answer?.answerType == 'CLOSE'">
-        <button class="chatbot-button" (click)="sendMessage(answer?.answerType, answer)">{{answer.text}}</button>
-      </div>
+    </div>
+    <div class="input-button" *ngIf="answer?.answerType == 'BUTTON' || answer?.answerType == 'CLOSE'">
+      <button class="chatbot-button" (click)="sendMessage(answer?.answerType, answer)">{{answer.text}}</button>
     </div>
   </div>
 </div>
