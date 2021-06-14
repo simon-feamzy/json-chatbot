@@ -15,7 +15,8 @@
       <button class="chatbot-button" (click)="sendMessage(answer?.answerType, answer)">{{answer.text}}</button>
     </div>
     <div class="input-select" *ngIf="answer?.answerType == 'SELECT'">
-      <select [(ngModel)]="content" *ngIf="!currentMsg.src || !currentMsg.src.label || currentMsg.src.label.length == 0">
+      <select [(ngModel)]="content" *ngIf="!currentMsg.src || !currentMsg.src.label || currentMsg.src.label.length == 0"
+      (change)="changeSelect($event)">
         <option *ngFor="let item of data | async" (click)="selectContent(item)">{{item}}</option>
         <option> ----- </option>
         <option (click)="selectContent(unknowItemKey)">{{unknowItem}}</option>
@@ -42,6 +43,8 @@
             <a (click)="selectContent(unknowItemKey)">{{unknowItem}}</a>
           </div>
         </div>
+        <input #txtSelect class="input-text-content" name="content" [(ngModel)]="content" (keyup)="tapSelect(txtSelect.value)"/>
+        <button class="chatbot-button" (click)="sendMessage(answer?.answerType, answer)">{{answer.text}}</button>
       </div>
     </div>
     <div class="input-button" *ngIf="answer?.answerType == 'BUTTON' || answer?.answerType == 'CLOSE'">

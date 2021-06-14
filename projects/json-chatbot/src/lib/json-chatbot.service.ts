@@ -57,7 +57,7 @@ export class JsonChatbotService {
       .pipe(
         map((data: any) => {
           if (data) {
-            var lst: string[] = data[field].sort();
+            var lst: [] = data[field].sort();
             // lst.filter()
             return lst;
           }

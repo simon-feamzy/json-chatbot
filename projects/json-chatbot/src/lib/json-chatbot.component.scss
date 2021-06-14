@@ -46,13 +46,16 @@
   background-color: var(--chatbubble-right-contrast);
   color: var(--chatbubble-left-contrast);
   border-color: var(--chatbubble-right);
-  font-size: medium;
+  font-size: small;
   line-height: 1.5em;
+  /*
   border-radius: 20px;
+  */
   border: none;
-  padding-left: 16px;
+  padding: 0px 20px;
   margin: 10px;
-  height: 40px;
+  position: absolute;
+  bottom: 60px;
 }
 
 .input-select-content a {

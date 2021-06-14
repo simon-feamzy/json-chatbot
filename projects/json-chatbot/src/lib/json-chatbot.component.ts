@@ -34,12 +34,12 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
   @Input() execService: ExecService;
   @Input() componentInstances: Map<string, any> = new Map();
   @Output() mapResult = new EventEmitter<ChatResponse>();
-  @ViewChild('chatbotContent', { static: false }) chatbotContent: ElementRef;
+  @ViewChild('chatbotContent', {static: false}) chatbotContent: ElementRef;
   @ViewChild(ChatbotDirectiveComponent) adHost!: ChatbotDirectiveComponent;
 
   args: Map<string, any> = new Map();
   messages: ChatMessage[] = [];
-  selectedContent: any = {id: '', value: ''};
+  selectedContent: any = {id: '', label: ''};
   content: any;
   currentMsg?: Step;
 
@@ -81,9 +81,16 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
     this.data.next([]);
   }
 
-  displayStep(): void {
+  async displayStep() {
     // display bot message (with loader if asks)
-    const msg = new ChatMessage(MessageType.MSG_RES, this.botName, this.currentMsg ? this.currentMsg.text : '',
+    let msgTxt = this.currentMsg ? this.currentMsg.text : '';
+    const reg = new RegExp("<([a-zA-Z0-9\\-_]+)>");
+    if (reg.test(msgTxt)) {
+      var res = msgTxt.match(reg)
+      url = msgTxt.replace(reg, encodeURI(this.args.get(res[1])));
+    }
+
+    const msg = new ChatMessage(MessageType.MSG_RES, this.botName, msgTxt,
       JsonChatbotService.getEpoch(), this.currentMsg ? this.currentMsg.timer : 0);
     msg.avatar = this.botIcon;
     this.messages.push(msg);
@@ -117,7 +124,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
       this.dataSubscription.unsubscribe();
       this.dataSearchTerms = new ReplaySubject(3);
       if (this.currentMsg?.src.static) {
-        this.utilsService.getStaticSelectData(url, this.currentMsg.src.path).subscribe(data => {
+        await this.utilsService.getStaticSelectData(url, this.currentMsg.src.path).toPromise().then(data => {
           this.data.next(data);
         });
       } else {
@@ -137,7 +144,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
             return of([])
           }),
           tap(() => this.areDataLoading = false)
-        ).subscribe((data:string[]) => {
+        ).subscribe((data: string[]) => {
           this.data.next(data);
           // specify if data has content
           if (data.length > 0) {
@@ -154,6 +161,9 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
     console.log('IonicChatbotComponent.sendMessage : ' + JSON.stringify(answer) + ', with content : ' + this.content);
     if ((answer.answerType === AnswerType.SELECT || answer.answerType === AnswerType.AUTOCOMPLETE) && this.currentMsg.src?.id?.length > 0) {
       this.args.set(this.currentMsg.id, this.selectedContent.id);
+      if (this.currentMsg.src?.label?.length > 0) {
+        this.args.set(this.currentMsg.id + '-label', this.selectedContent.label);
+      }
     } else {
       this.args.set(this.currentMsg.id, this.content);
     }
@@ -200,15 +210,12 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
         return reg.test(result);
       }).next;
 
-
       this.resetToolbar();
       this.currentMsg = this.utilsService.getNextStep(nextStep);
       if (this.currentMsg) {
         this.displayStep();
       }
-
     });
-
   }
 
   scrollToBottom() {
@@ -251,5 +258,9 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
 
   get unknowItemKey() {
     return JsonChatbotComponent.UNKNOW_ITEM_KEY;
+  }
+
+  changeSelect($event) {
+
   }
 }
