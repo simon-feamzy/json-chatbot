@@ -137,7 +137,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
             return of([])
           }),
           tap(() => this.areDataLoading = false)
-        ).subscribe(data => {
+        ).subscribe((data:string[]) => {
           this.data.next(data);
           // specify if data has content
           if (data.length > 0) {

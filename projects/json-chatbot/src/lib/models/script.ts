@@ -8,7 +8,7 @@ export class Step {
   text = '';
   answers: Answer[] = [];
   timer = 0;
-  src:Source;
+  src: Source;
 }
 
 export class Source {

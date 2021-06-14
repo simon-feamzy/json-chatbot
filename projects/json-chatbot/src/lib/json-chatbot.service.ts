@@ -5,7 +5,6 @@ import {map} from 'rxjs/operators';
 import {Observable, of} from 'rxjs';
 import {Script, Step} from './models/script';
 
-
 const httpOptionsGet = {
   headers: new HttpHeaders({
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -52,7 +51,7 @@ export class JsonChatbotService {
     return result;
   }
 
-  getStaticSelectData(url: string, field:string): Observable<any[]> {
+  getStaticSelectData(url: string, field: string): Observable<any[]> {
 
     return this.httpClient.get(url, httpOptionsGet)
       .pipe(
