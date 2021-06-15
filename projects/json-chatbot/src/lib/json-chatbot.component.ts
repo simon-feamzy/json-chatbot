@@ -13,7 +13,7 @@ import {
 import {ChatMessage, ChatResponse, MessageType} from './models/message';
 import {Answer, AnswerType, Step} from './models/script';
 import {JsonChatbotService} from './json-chatbot.service';
-import {of, ReplaySubject, Subject, Subscription} from 'rxjs';
+import {of, ReplaySubject, Subscription} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, switchMap, tap} from 'rxjs/operators';
 import {ChatbotDirectiveComponent} from "./chatbot-directive.component";
 import {ExecService, ScriptComponent} from "./interfaces/script.component";
@@ -78,7 +78,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
     this.currentAnswers = [];
     this.content = '';
     this.hasDataContent = false;
-    this.data=[];
+    this.data = [];
   }
 
   async displayStep() {
@@ -87,7 +87,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
     const reg = new RegExp("<([a-zA-Z0-9\\-_]+)>");
     if (reg.test(msgTxt)) {
       var res = msgTxt.match(reg)
-      url = msgTxt.replace(reg, encodeURI(this.args.get(res[1])));
+      msgTxt = msgTxt.replace(reg, this.args.get(res[1]));
     }
 
     const msg = new ChatMessage(MessageType.MSG_RES, this.botName, msgTxt,
@@ -124,16 +124,16 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
       this.dataSubscription.unsubscribe();
       this.dataSearchTerms = new ReplaySubject(3);
       if (this.currentMsg?.src.static) {
-        this.dataSubscription =  this.utilsService.getStaticSelectData(url, this.currentMsg.src.path).subscribe(data => {
+        this.dataSubscription = this.utilsService.getStaticSelectData(url, this.currentMsg.src.path).subscribe(data => {
           this.data = data;
-        });
+        }, error => console.error("utilsService.getStaticSelectData : " + JSON.stringify(error)));
       } else {
         this.dataSubscription = this.dataSearchTerms.pipe(
           debounceTime(this.DEBOUNCE_TIME_IN_MS),
           distinctUntilChanged(),
           tap(() => this.areDataLoading = true),
           switchMap((term: string) => {
-              return this.utilsService.getSelectData(url, term, this.MIN_CHAR);
+            return this.utilsService.getSelectData(url, term, this.MIN_CHAR);
           }),
           catchError((error) => {
             console.log(error);
@@ -148,7 +148,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
           } else {
             this.hasDataContent = false;
           }
-        });
+        }, error => console.error("dataSearchTerms.pipe : " + JSON.stringify(error)));
       }
     }
   }
@@ -257,8 +257,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
   }
 
   onChange($event: any) {
-    debugger
-    if ($event!=this.unknowItemKey && this.currentMsg.src?.id?.length > 0) {
+    if ($event != this.unknowItemKey && this.currentMsg.src?.id?.length > 0) {
       this.selectedContent.id = $event[this.currentMsg.src?.id];
       this.selectedContent.label = $event[this.currentMsg.src?.label];
       this.content = $event[this.currentMsg.src?.label];

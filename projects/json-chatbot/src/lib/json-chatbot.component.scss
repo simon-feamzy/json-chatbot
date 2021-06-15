@@ -2,6 +2,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  font-size: medium;
 }
 
 .chatbot-content {
@@ -34,8 +35,9 @@
   border-radius: 20px;
   border: none;
   padding-left: 16px;
-  height: 40px;
-  margin: 10px;
+  height: 42px;
+  margin: 16px;
+  background-color: var(--chatbubble-input);
 }
 
 .input-text-content:focus {
@@ -43,17 +45,25 @@
 }
 
 .input-select-content {
-  background-color: var(--chatbubble-right-contrast);
+  background-color: var(--chatbubble-input);
   color: var(--chatbubble-left-contrast);
   border-color: var(--chatbubble-right);
-  font-size: small;
-  line-height: 1.5em;
-  /*
+  font-size: medium;
   border-radius: 20px;
-  */
+  border: none;
+  margin: 16px;
+  max-width: 40vw;
+}
+
+.input-autocomplete-content {
+  background-color: var(--chatbubble-input);
+  color: var(--chatbubble-left-contrast);
+  border-color: var(--chatbubble-right);
+  font-size: medium;
+  line-height: 1.5em;
   border: none;
   padding: 0px 20px;
-  margin: 10px;
+  margin: 16px;
   position: absolute;
   bottom: 60px;
 }
@@ -68,4 +78,6 @@
   min-width: 100px;
   height: 42px;
   margin: 16px;
+  background-color: var(--chatbubble-input);
+  font-size: medium;
 }
