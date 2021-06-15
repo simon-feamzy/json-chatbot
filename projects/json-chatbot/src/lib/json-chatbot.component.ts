@@ -50,7 +50,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
   // subscriptions save as variable to call unsubscribre on destroy
   dataSubscription: Subscription = new Subscription();
   // data use to display select values
-  data: Subject<string[]> = new Subject<string[]>();
+  data: string[] = [];
   areDataLoading = false;
   hasDataContent = false;
 
@@ -78,7 +78,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
     this.currentAnswers = [];
     this.content = '';
     this.hasDataContent = false;
-    this.data.next([]);
+    this.data=[];
   }
 
   async displayStep() {
@@ -124,8 +124,8 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
       this.dataSubscription.unsubscribe();
       this.dataSearchTerms = new ReplaySubject(3);
       if (this.currentMsg?.src.static) {
-        await this.utilsService.getStaticSelectData(url, this.currentMsg.src.path).toPromise().then(data => {
-          this.data.next(data);
+        this.dataSubscription =  this.utilsService.getStaticSelectData(url, this.currentMsg.src.path).subscribe(data => {
+          this.data = data;
         });
       } else {
         this.dataSubscription = this.dataSearchTerms.pipe(
@@ -133,11 +133,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
           distinctUntilChanged(),
           tap(() => this.areDataLoading = true),
           switchMap((term: string) => {
-            if (this.currentMsg?.src.static) {
-              return this.utilsService.getStaticSelectData(url, this.currentMsg.src.path);
-            } else {
               return this.utilsService.getSelectData(url, term, this.MIN_CHAR);
-            }
           }),
           catchError((error) => {
             console.log(error);
@@ -145,7 +141,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
           }),
           tap(() => this.areDataLoading = false)
         ).subscribe((data: string[]) => {
-          this.data.next(data);
+          this.data = data;
           // specify if data has content
           if (data.length > 0) {
             this.hasDataContent = true;
@@ -194,7 +190,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
     const resp = new ChatResponse();
     resp.id = this.currentMsg.id;
     resp.type = type;
-    if (answer.answerType === AnswerType.SELECT && this.currentMsg.src?.id?.length > 0) {
+    if (this.content != JsonChatbotComponent.UNKNOW_ITEM_KEY && answer.answerType === AnswerType.SELECT && this.currentMsg.src?.id?.length > 0) {
       resp.value = this.selectedContent;
     } else {
       resp.value = this.content;
@@ -260,7 +256,15 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
     return JsonChatbotComponent.UNKNOW_ITEM_KEY;
   }
 
-  changeSelect($event) {
+  onChange($event: any) {
+    debugger
+    if ($event!=this.unknowItemKey && this.currentMsg.src?.id?.length > 0) {
+      this.selectedContent.id = $event[this.currentMsg.src?.id];
+      this.selectedContent.label = $event[this.currentMsg.src?.label];
+      this.content = $event[this.currentMsg.src?.label];
+    } else {
+      this.content = $event;
+    }
 
   }
 }
