@@ -1,23 +1,49 @@
-<div class="chatbot-content">
-  <lib-chat-bubble [chatMessage]="msg" *ngFor="let msg of messages" [ellipsis]="loaderIcon"></lib-chat-bubble>
-</div>
+<div class="chatbot">
+  <div #chatbotContent class="chatbot-content">
+    <lib-chat-bubble [chatMessage]="msg" *ngFor="let msg of messages" [ellipsis]="loaderIcon"></lib-chat-bubble>
+  </div>
 
-<div class="footer">
-  <ng-template adHost></ng-template>
-  <div *ngFor="let answer of currentAnswers" class="answer">
+<div class="chatbot-footer" role="footer">
+  <div *ngIf="hasComponent()">
+    <ng-template adHost></ng-template>
+  </div>
+
+  <div *ngFor="let answer of currentAnswers">
     <div class="input-text" *ngIf="answer?.answerType == 'INPUT'">
       <input #txtInput [name]="content" [(ngModel)]="content" (keyup)="onKey(txtInput.value)"
              class="input-text-content"/>
       <button class="chatbot-button" (click)="sendMessage(answer?.answerType, answer)">{{answer.text}}</button>
     </div>
     <div class="input-select" *ngIf="answer?.answerType == 'SELECT'">
-      <div item-content>
-        <div class="input-select-content" *ngIf="data">
-          <div *ngFor="let item of data"><a (click)="onKey(item);tapSelect(item)">{{item}}</a></div>
+      <select [ngModel]="content" *ngIf="!currentMsg.src || !currentMsg.src.label || currentMsg.src.label.length == 0"
+              (ngModelChange)="onChange($event)" class="input-select-content">
+        <option *ngFor="let item of data" [ngValue]="item">{{item}}</option>
+        <option value=""> ----- </option>
+        <option [ngValue]="unknowItemKey">{{unknowItem}}</option>
+      </select>
+      <select [ngModel]="content" *ngIf="currentMsg.src?.label?.length > 0" (ngModelChange)="onChange($event)" class="input-select-content">
+        <option *ngFor="let item of data" [ngValue]="item">{{item[currentMsg.src.label]}}</option>
+        <option value=""> ----- </option>
+        <option [ngValue]="unknowItemKey">{{unknowItem}}</option>
+      </select>
+      <button class="chatbot-button" (click)="sendMessage(answer?.answerType, answer)">{{answer.text}}</button>
+    </div>
+    <div class="input-select" *ngIf="answer?.answerType == 'AUTOCOMPLETE'">
+      <div class="input-autocomplete-content" *ngIf="data">
+        <div *ngFor="let item of data">
+          <a (click)="selectContent(item)" *ngIf="!currentMsg.src || !currentMsg.src.label || currentMsg.src.label.length == 0">{{item}}</a>
+          <a (click)="selectContent(item)"
+             *ngIf="currentMsg.src?.label?.length > 0">{{item[currentMsg.src.label]}}</a>
         </div>
-        <input #txtSelect name="content" [(ngModel)]="content" (keyup)="tapSelect(txtSelect.value)"/>
-        <button class="chatbot-button" (click)="sendMessage(answer?.answerType, answer)">{{answer.text}}</button>
+        <div *ngIf="hasDataContent">
+          <span> ----- </span>
+        </div>
+        <div *ngIf="hasDataContent">
+          <a (click)="selectContent(unknowItemKey)">{{unknowItem}}</a>
+        </div>
       </div>
+      <input #txtSelect class="input-text-content" name="content" [(ngModel)]="content" (keyup)="tapSelect(txtSelect.value)"/>
+      <button class="chatbot-button" (click)="sendMessage(answer?.answerType, answer)">{{answer.text}}</button>
     </div>
     <div class="input-button" *ngIf="answer?.answerType == 'BUTTON' || answer?.answerType == 'CLOSE'">
       <button class="chatbot-button" (click)="sendMessage(answer?.answerType, answer)">{{answer.text}}</button>

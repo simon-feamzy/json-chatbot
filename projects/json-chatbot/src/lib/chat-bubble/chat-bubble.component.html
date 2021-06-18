@@ -1,7 +1,7 @@
 <div>
   <div class="chat-bubble {{getPosition()}}">
     <img class="message-avatar-{{getPosition()}}" [src]="chatMessage?.avatar" *ngIf="chatMessage && chatMessage.avatar && chatMessage.avatar.length > 0" />
-    <div class="message-author">{{chatMessage?.author}}</div>
+    <div *ngIf="chatMessage?.author"class="message-author">{{chatMessage?.author}}</div>
     <div class="message">
       <img [src]="ellipsis" *ngIf="chatMessage && chatMessage.loading && ellipsis"/>
       <span *ngIf="!(chatMessage && chatMessage.loading) || !ellipsis">{{chatMessage?.message}}</span>

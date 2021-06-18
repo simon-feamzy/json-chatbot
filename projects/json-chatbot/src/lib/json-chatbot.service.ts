@@ -5,7 +5,6 @@ import {map} from 'rxjs/operators';
 import {Observable, of} from 'rxjs';
 import {Script, Step} from './models/script';
 
-
 const httpOptionsGet = {
   headers: new HttpHeaders({
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -48,11 +47,39 @@ export class JsonChatbotService {
 
   getNextStep(name: string): Step {
     const result = this.script?.children.filter(child => child.id === name)[0];
+    if (!result){
+      return this.getDefaultErrorStep();
+    }
     // @ts-ignore
     return result;
   }
 
-  getSelectData(url: string, searchTerm: string, searchTermMinLength: number): Observable<string[]> {
+  getDefaultErrorStep(): Step {
+    const result = this.script?.children.filter(child => child.id === this.script?.defaultError)[0];
+    // @ts-ignore
+    return result;
+  }
+
+  getStaticSelectData(url: string, field: string): Observable<any[]> {
+
+    return this.httpClient.get(url, httpOptionsGet)
+      .pipe(
+        map((data: any) => {
+          if (data) {
+            var lst: [] = [];
+            if (field) {
+              lst = data[field].sort();
+            } else {
+              lst = data;
+            }
+            return lst;
+          }
+          return [];
+        })
+      );
+  }
+
+  getSelectData(url: string, searchTerm: string, searchTermMinLength: number): Observable<any[]> {
 
     if (!searchTerm.trim() || searchTerm.length < searchTermMinLength) {
       return of([]);
@@ -61,12 +88,22 @@ export class JsonChatbotService {
       .pipe(
         map((data: any) => {
           if (data) {
-            return data?._embedded?.stringList.sort();
+            var lst: string[] = data._embedded[Object.keys(data._embedded)[0]].sort();
+            return lst;
           }
           return [];
         })
       );
   }
 
+  checkAnswer(url: string, param: string): Observable<boolean> {
+    const httpOptionsGet = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json'
+      }),
+    };
+    return this.httpClient.get<boolean>(url + param, httpOptionsGet);
+  }
 
 }
