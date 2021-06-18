@@ -47,6 +47,15 @@ export class JsonChatbotService {
 
   getNextStep(name: string): Step {
     const result = this.script?.children.filter(child => child.id === name)[0];
+    if (!result){
+      return this.getDefaultErrorStep();
+    }
+    // @ts-ignore
+    return result;
+  }
+
+  getDefaultErrorStep(): Step {
+    const result = this.script?.children.filter(child => child.id === this.script?.defaultError)[0];
     // @ts-ignore
     return result;
   }

@@ -1,6 +1,7 @@
 export class Script {
   root = '';
   children: Step[] = [];
+  defaultError = '';
 }
 
 export class Step {
