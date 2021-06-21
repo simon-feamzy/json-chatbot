@@ -206,8 +206,10 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
         return reg.test(result);
       }).next;
 
+      console.log("execService.nextStep : " + nextStep);
       this.resetToolbar();
       this.currentMsg = this.utilsService.getNextStep(nextStep);
+      console.log("execService.currentMsg : " + JSON.stringify(this.currentMsg));
       if (this.currentMsg) {
         this.displayStep();
       }
