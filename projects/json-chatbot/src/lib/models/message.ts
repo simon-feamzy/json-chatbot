@@ -1,4 +1,4 @@
-import {AnswerType} from "./script";
+import {Action, AnswerType} from "./script";
 
 export class ChatMessage {
   type: MessageType = MessageType.MSG_REQ;
@@ -27,8 +27,9 @@ export class MessageType {
 }
 
 export class ChatResponse {
-  action = '';
+  id = '';
   type: AnswerType;
-  value = '';
-  args: [] = [];
+  value:any;
+  args: Map<string, string>;
+  actions: Action[] = [];
 }

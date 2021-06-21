@@ -2,52 +2,62 @@ import {
   Component,
   ComponentFactory,
   ComponentFactoryResolver,
+  ElementRef,
   EventEmitter,
   Input,
+  OnDestroy,
   OnInit,
   Output,
-  SimpleChanges,
   ViewChild
 } from '@angular/core';
 import {ChatMessage, ChatResponse, MessageType} from './models/message';
 import {Answer, AnswerType, Step} from './models/script';
 import {JsonChatbotService} from './json-chatbot.service';
-import {of, Subject, Subscription} from 'rxjs';
+import {of, ReplaySubject, Subscription} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, switchMap, tap} from 'rxjs/operators';
 import {ChatbotDirectiveComponent} from "./chatbot-directive.component";
+import {ExecService, ScriptComponent} from "./interfaces/script.component";
 
 @Component({
   selector: 'lib-json-chatbot',
   templateUrl: './json-chatbot.component.html',
   styleUrls: ['./json-chatbot.component.scss']
 })
-export class JsonChatbotComponent implements OnInit {
+export class JsonChatbotComponent implements OnInit, OnDestroy {
   @Input() botName = 'bot';
   @Input() botIcon = '';
-  @Input() userName = 'you';
+  @Input() userName = '';
   @Input() userIcon = '';
   @Input() jsonFile = '';
   @Input() withDate = false;
   @Input() loaderIcon = '';
-  @Input() error = '';
+  @Input() execService: ExecService;
   @Input() componentInstances: Map<string, any> = new Map();
   @Output() mapResult = new EventEmitter<ChatResponse>();
-  args: [] = [];
-
+  @ViewChild('chatbotContent', {static: false}) chatbotContent: ElementRef;
   @ViewChild(ChatbotDirectiveComponent) adHost!: ChatbotDirectiveComponent;
 
+  args: Map<string, any> = new Map();
   messages: ChatMessage[] = [];
+  selectedContent: any = {id: '', label: ''};
   content: any;
   currentMsg?: Step;
 
   currentAnswers: Answer[] = [];
 
-  dataSearchTerms: Subject<string> = new Subject<string>();
+  // subject use to save user input (keep only 3 last values)
+  dataSearchTerms: ReplaySubject<string> = new ReplaySubject<string>(3);
+  // subscriptions save as variable to call unsubscribre on destroy
   dataSubscription: Subscription = new Subscription();
+  // data use to display select values
   data: string[] = [];
   areDataLoading = false;
+  hasDataContent = false;
+
   readonly DEBOUNCE_TIME_IN_MS: number = 300;
-  minChar = 3;
+  readonly MIN_CHAR = 3;
+  public static UNKNOW_ITEM_KEY = "not-found";
+  public static UNKNOW_ITEM = "Je ne trouve pas";
 
   constructor(private utilsService: JsonChatbotService,
               private componentFactoryResolver: ComponentFactoryResolver) {
@@ -60,98 +70,200 @@ export class JsonChatbotComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    this.dataSubscription.unsubscribe();
+  }
+
   resetToolbar(): void {
     this.currentAnswers = [];
     this.content = '';
-    this.args = [];
+    this.hasDataContent = false;
+    this.data = [];
   }
 
-  displayStep(): void {
-    const msg = new ChatMessage(MessageType.MSG_RES, this.botName, this.currentMsg ? this.currentMsg.text : '',
+  async displayStep() {
+    // display bot message (with loader if asks)
+    let msgTxt = this.currentMsg ? this.currentMsg.text : '';
+    const reg = new RegExp("<([a-zA-Z0-9\\-_]+)>");
+    if (reg.test(msgTxt)) {
+      var res = msgTxt.match(reg)
+      msgTxt = msgTxt.replace(reg, this.args.get(res[1]));
+    }
+
+    const msg = new ChatMessage(MessageType.MSG_RES, this.botName, msgTxt,
       JsonChatbotService.getEpoch(), this.currentMsg ? this.currentMsg.timer : 0);
     msg.avatar = this.botIcon;
     this.messages.push(msg);
+
+    // wait timer value to display real message and footer content
     setTimeout(() => {
       msg.loading = false;
       this.currentAnswers = this.currentMsg.answers;
       const answerComponent = this.currentMsg.answers.filter(answer => answer.answerType === AnswerType.COMPONENT);
       if (answerComponent && answerComponent.length > 0) {
-        const componentFactory: ComponentFactory<any> = this.componentFactoryResolver.resolveComponentFactory(this.componentInstances.get(answerComponent[0].component));
+        const componentFactory: ComponentFactory<ScriptComponent> = this.componentFactoryResolver.resolveComponentFactory(this.componentInstances.get(answerComponent[0].component));
         const viewContainerRef = this.adHost.viewContainerRef;
         viewContainerRef.clear();
         const componentRef = viewContainerRef.createComponent(componentFactory);
-        if (answerComponent[0].component == 'InvitationCodeComponent') {
-          componentRef.instance.isFamilyManagment = false;
-          componentRef.instance.invitationType.setValue('CL');
-          this.content = componentRef.instance.getInvitationCode();
-          componentRef.changeDetectorRef.detectChanges();
-          componentRef.instance.invitationCodeForm.get('childName').setValue()
-          let validatedCodeEvent: EventEmitter<string> = componentRef.instance.validatedCodeEvent;
-          this.args['validatedCodeEvent'] = validatedCodeEvent;
-          this.args['validatedCodeEvent'].subscribe(value => this.args['validatedCode'] = value);
-          let childNameEvent: EventEmitter<string> = componentRef.instance.childNameEvent;
-          this.args['childNameEvent'] = childNameEvent;
-          this.args['childNameEvent'].subscribe(value => this.args['childName'] = value);
-        }
+        componentRef.changeDetectorRef.detectChanges();
+        componentRef.instance.init();
       }
     }, msg.timer);
+
+    // if select content is loaded from url, subscribe to this url to get data
     if (this.currentMsg?.src) {
-      this.dataSubscription = this.dataSearchTerms.pipe(
-        debounceTime(this.DEBOUNCE_TIME_IN_MS),
-        distinctUntilChanged(),
-        tap(() => this.areDataLoading = true),
-        switchMap((term: string) => this.utilsService.getSelectData(this.currentMsg ? this.currentMsg.src : '', term, this.minChar)),
-        catchError(() => of([])),
-        tap(() => this.areDataLoading = false)
-      ).subscribe((data => this.data = data));
+      var url = this.currentMsg.src.url;
+
+      // replace variable in url from args values
+      const reg = new RegExp("<([a-zA-Z0-9\\-_]+)>");
+      if (reg.test(url)) {
+        var res = url.match(reg)
+        url = url.replace(reg, encodeURI(this.args.get(res[1])));
+      }
+      console.log("url source : " + url);
+      this.dataSubscription.unsubscribe();
+      this.dataSearchTerms = new ReplaySubject(3);
+      if (this.currentMsg?.src.static) {
+        this.dataSubscription = this.utilsService.getStaticSelectData(url, this.currentMsg.src.path).subscribe(data => {
+          this.data = data;
+        }, error => console.error("utilsService.getStaticSelectData : " + JSON.stringify(error)));
+      } else {
+        this.dataSubscription = this.dataSearchTerms.pipe(
+          debounceTime(this.DEBOUNCE_TIME_IN_MS),
+          distinctUntilChanged(),
+          tap(() => this.areDataLoading = true),
+          switchMap((term: string) => {
+            return this.utilsService.getSelectData(url, term, this.MIN_CHAR);
+          }),
+          catchError((error) => {
+            console.log(error);
+            return of([])
+          }),
+          tap(() => this.areDataLoading = false)
+        ).subscribe((data: string[]) => {
+          this.data = data;
+          // specify if data has content
+          if (data.length > 0) {
+            this.hasDataContent = true;
+          } else {
+            this.hasDataContent = false;
+          }
+        }, error => console.error("dataSearchTerms.pipe : " + JSON.stringify(error)));
+      }
     }
   }
 
-  sendMessage(type: AnswerType | undefined, answer: Answer): void {
+  async sendMessage(type: AnswerType | undefined, answer: Answer) {
     console.log('IonicChatbotComponent.sendMessage : ' + JSON.stringify(answer) + ', with content : ' + this.content);
-
-    const resp = new ChatResponse();
-    resp.action = answer.action;
-    resp.type = type;
-    resp.value = this.content;
-    resp.args = this.args;
-    this.mapResult.emit(resp);
-
+    if ((answer.answerType === AnswerType.SELECT || answer.answerType === AnswerType.AUTOCOMPLETE) && this.currentMsg.src?.id?.length > 0) {
+      this.args.set(this.currentMsg.id, this.selectedContent.id);
+      if (this.currentMsg.src?.label?.length > 0) {
+        this.args.set(this.currentMsg.id + '-label', this.selectedContent.label);
+      }
+    } else {
+      this.args.set(this.currentMsg.id, this.content);
+    }
+    // display user message
     let msg: ChatMessage;
     if (type === AnswerType.INPUT) {
       msg = new ChatMessage(MessageType.MSG_REQ, this.userName, this.content, JsonChatbotService.getEpoch(), 0);
-    } else if (type === AnswerType.SELECT) {
-      msg = new ChatMessage(MessageType.MSG_REQ, this.userName, this.content, JsonChatbotService.getEpoch(), 0);
+    } else if (type === AnswerType.SELECT || type === AnswerType.AUTOCOMPLETE) {
+      var label: string = this.content;
+      if (label === JsonChatbotComponent.UNKNOW_ITEM_KEY) {
+        label = JsonChatbotComponent.UNKNOW_ITEM;
+      }
+      msg = new ChatMessage(MessageType.MSG_REQ, this.userName, label, JsonChatbotService.getEpoch(), 0);
     } else if (type === AnswerType.BUTTON) {
-      msg = new ChatMessage(MessageType.MSG_REQ, this.userName, answer.text, JsonChatbotService.getEpoch(), 0);
+      var label: string = answer.text;
+      if (label === JsonChatbotComponent.UNKNOW_ITEM_KEY) {
+        label = JsonChatbotComponent.UNKNOW_ITEM;
+      }
+      msg = new ChatMessage(MessageType.MSG_REQ, this.userName, label, JsonChatbotService.getEpoch(), 0);
     } else {
       //type == CLOSE
     }
     if (msg) {
       this.messages.push(msg);
     }
-    this.resetToolbar();
-    this.currentMsg = this.utilsService.getNextStep(answer.action);
-    if (this.currentMsg) {
-      this.displayStep();
+
+    // construct message send to execService
+    const resp = new ChatResponse();
+    resp.id = this.currentMsg.id;
+    resp.type = type;
+    if (this.content != JsonChatbotComponent.UNKNOW_ITEM_KEY && answer.answerType === AnswerType.SELECT && this.currentMsg.src?.id?.length > 0) {
+      resp.value = this.selectedContent;
+    } else {
+      resp.value = this.content;
     }
+    resp.args = this.args;
+    resp.actions = answer.actions;
+    console.log('IonicChatbotComponent.execService.execute : ' + JSON.stringify(resp));
+
+    this.execService.execute(resp).then(result => {
+      console.log("execService.execute : " + result);
+      const nextStep = answer.actions.find(action => {
+        const reg = new RegExp(action.value);
+        return reg.test(result);
+      }).next;
+
+      this.resetToolbar();
+      this.currentMsg = this.utilsService.getNextStep(nextStep);
+      if (this.currentMsg) {
+        this.displayStep();
+      }
+    });
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    for (const propName in changes) {
-      const chng = changes[propName];
-      const cur = JSON.stringify(chng.currentValue);
-      const prev = JSON.stringify(chng.previousValue);
-      console.log(`${propName}: currentValue = ${cur}, previousValue = ${prev}`);
-    }
+  scrollToBottom() {
+    this.chatbotContent.nativeElement.scroll({
+      top: this.chatbotContent.nativeElement.scrollHeight,
+      left: 0,
+      behavior: 'smooth'
+    });
+  }
+
+  ngAfterViewChecked() {
+    this.scrollToBottom();
   }
 
   onKey(value: string): void {
     this.content = value;
   }
 
+  selectContent(value: any): void {
+    if (this.currentMsg.src?.id?.length > 0) {
+      this.selectedContent.id = value[this.currentMsg.src?.id];
+      this.selectedContent.label = value[this.currentMsg.src.label];
+      this.content = value[this.currentMsg.src?.label];
+    } else {
+      this.content = value;
+    }
+  }
+
   tapSelect(value: string): void {
     this.dataSearchTerms.next(value);
   }
 
+  hasComponent(): boolean {
+    return this.currentMsg?.answers?.filter(answer => answer.answerType === AnswerType.COMPONENT).length > 0;
+  }
+
+  get unknowItem() {
+    return JsonChatbotComponent.UNKNOW_ITEM;
+  }
+
+  get unknowItemKey() {
+    return JsonChatbotComponent.UNKNOW_ITEM_KEY;
+  }
+
+  onChange($event: any) {
+    if ($event != this.unknowItemKey && this.currentMsg.src?.id?.length > 0) {
+      this.selectedContent.id = $event[this.currentMsg.src?.id];
+      this.selectedContent.label = $event[this.currentMsg.src?.label];
+      this.content = $event[this.currentMsg.src?.label];
+    } else {
+      this.content = $event;
+    }
+
+  }
 }
