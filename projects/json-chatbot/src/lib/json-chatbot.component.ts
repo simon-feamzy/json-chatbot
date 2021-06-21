@@ -87,7 +87,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
     const reg = new RegExp("<([a-zA-Z0-9\\-_]+)>");
     if (reg.test(msgTxt)) {
       var res = msgTxt.match(reg)
-      msgTxt = msgTxt.replace(reg, this.args.get(res[1]));
+      msgTxt = msgTxt.replace(reg, this.args.get(res[1])?this.args.get(res[1]):'');
     }
 
     const msg = new ChatMessage(MessageType.MSG_RES, this.botName, msgTxt,
