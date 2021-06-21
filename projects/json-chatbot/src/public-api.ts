@@ -9,3 +9,4 @@ export * from './lib/chat-bubble/chat-bubble.component';
 export * from './lib/models/message';
 export * from './lib/models/script';
 export * from './lib/interfaces/script.component';
+export * from './lib/chatbot-directive.component';

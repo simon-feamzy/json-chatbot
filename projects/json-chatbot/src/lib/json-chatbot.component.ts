@@ -163,6 +163,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
     } else {
       this.args.set(this.currentMsg.id, this.content);
     }
+
     // display user message
     let msg: ChatMessage;
     if (type === AnswerType.INPUT) {
@@ -240,6 +241,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
     } else {
       this.content = value;
     }
+    this.data = [];
   }
 
   tapSelect(value: string): void {
