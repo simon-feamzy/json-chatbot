@@ -241,7 +241,7 @@ export class JsonChatbotComponent implements OnInit, OnDestroy {
     } else {
       this.content = value;
     }
-    this.data = [];
+    this.data = undefined;
   }
 
   tapSelect(value: string): void {
